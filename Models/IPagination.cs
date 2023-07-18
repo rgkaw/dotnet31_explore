@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using mvc.Data;
 
 namespace mvc.Models
 {
@@ -11,10 +13,12 @@ namespace mvc.Models
             ItemCount = 1;
             Limit = 10;
         }
+        public string Search {get;set;}
         public int Page { get; set; }
         public int TotalPage { get; set; }
         public int ItemCount { get; set; }
         public int Limit { get; set; }
+        public string Path {get; set;}
 
         public bool HasNextPage() { return Page < TotalPage; }
         public bool HasPreviousPage() { return Page > 1; }

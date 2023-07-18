@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mvc.Data;
 using mvc.Models;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using static System.Reflection.Metadata.BlobBuilder;
 
@@ -35,7 +39,7 @@ namespace mvc.Controllers
             return Ok(book);
         }
         // GET: id
-        public IActionResult Index([FromQuery(Name = "id")] int? id, [FromQuery(Name = "name")] string name, [FromQuery(Name = "author")] string author, int page = 1, int limit =10)
+        public IActionResult Index([FromQuery(Name = "id")] int? id, [FromQuery(Name = "name")] string name, [FromQuery(Name = "author")] string author, int page = 1, int limit =5)
         {
             HttpContext.Request.Headers.Add("Authorization", Request.Cookies["accessToken"]);
 
@@ -62,10 +66,12 @@ namespace mvc.Controllers
                 };
                 return View(pb);
             }
-            List<Book> books = _db.Book.ToList();
-            var totalItem = books.Count();
+            List<Book> books = _db.Book
+                .Skip((page -1)*limit)
+                .Take(limit)
+                .ToList();
+            var totalItem = _db.Book.Count();
             var totalPages = (int)Math.Ceiling((double)totalItem / (double)limit);
-            var items = books.Skip((page - 1) * limit).Take(limit).ToList();
             PaginateBook pbs = new PaginateBook
             {
                 Pagination = new Pagination { Page = page, Limit = limit, ItemCount = totalItem, TotalPage=totalPages },
@@ -160,6 +166,41 @@ namespace mvc.Controllers
         private bool BookExists(int? id)
         {
             return _db.Book.Any(e => e.Id == id);
+        }
+
+
+    
+        [HttpGet]
+        public IActionResult Download(){
+            using(ExcelPackage excelPackage = new ExcelPackage())
+            {
+                List<Book> books = _db.Book.ToList();
+                string filename= "Table_List";
+                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(filename);
+                if(!books.Any()){
+                    ViewData.Add("ErrorDownload","Table is Empty! nothing to download");
+                    RedirectToAction("Index");
+                }
+                int i=1;
+                foreach(var prop in books.First().GetType().GetProperties()){
+                    worksheet.Cells[1,i].Value=prop.Name;
+                    i++;
+                }
+                for(i = 2; i<books.Count;i++)
+                {
+                    PropertyInfo[] prop = books[i].GetType().GetProperties();
+                    int j=1;
+                    foreach(var val in prop){
+                        worksheet.Cells[i,j].Value=val.GetValue(books[i],null).ToString();
+                        j++;
+                    }
+                }
+                MemoryStream stream = new MemoryStream();
+                excelPackage.SaveAs(stream);
+                stream.Position=0;
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename+".xlsx");
+
+            }
         }
 
 

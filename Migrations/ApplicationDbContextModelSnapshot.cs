@@ -19,6 +19,27 @@ namespace mvc.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("mvc.Models.Attachment", b =>
+                {
+                    b.Property<Guid>("Guid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Filename")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Guid");
+
+                    b.ToTable("Attachment");
+                });
+
             modelBuilder.Entity("mvc.Models.Book", b =>
                 {
                     b.Property<int>("Id")
@@ -38,22 +59,6 @@ namespace mvc.Migrations
                     b.ToTable("Book");
                 });
 
-            modelBuilder.Entity("mvc.Models.Role", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Role");
-                });
-
             modelBuilder.Entity("mvc.Models.User", b =>
                 {
                     b.Property<string>("Username")
@@ -67,21 +72,9 @@ namespace mvc.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
-
                     b.HasKey("Username");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("User");
-                });
-
-            modelBuilder.Entity("mvc.Models.User", b =>
-                {
-                    b.HasOne("mvc.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId");
                 });
 #pragma warning restore 612, 618
         }

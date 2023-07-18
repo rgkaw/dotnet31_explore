@@ -33,7 +33,13 @@ namespace mvc.Controllers
         public IActionResult Index() {
             return RedirectToAction("Login");
         }
-        [HttpPost("api/v1/[controller]/register")]
+        
+        [HttpGet]
+        public IActionResult Register() {
+            return View();
+        }
+
+        [HttpPost]
         public async Task<ActionResult> Register(UserDto req)
         {
             User User = new User();
@@ -43,21 +49,14 @@ namespace mvc.Controllers
             User.PasswordSalt = passwordSalt;
             if (!ModelState.IsValid)
             {
-                return BadRequest("Bad Form");
+                ModelState.AddModelError("","Can't Register");
+                return View(req);
             }
             _db.User.Add(User);
             await _db.SaveChangesAsync();
-            return Ok(User);
+            return RedirectToAction("Login","Auth");
         }
-
-        public IActionResult Register() {
-            UserDto ex = new UserDto {
-                Username = "",
-                Password = ""
-            };
-            return View(ex);
-        }
-
+        [HttpGet]
         public ActionResult Login() {
             ClaimsPrincipal claimUser = HttpContext.User;
             if (claimUser.Identity.IsAuthenticated) 
@@ -66,7 +65,9 @@ namespace mvc.Controllers
             }
             return View();
         }
-        [HttpPost("api/v1/[controller]/login")]
+
+
+        [HttpPost]
         public async Task<ActionResult> Login(UserDto req)
         {
             
