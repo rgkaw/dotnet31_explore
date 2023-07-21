@@ -82,18 +82,12 @@ namespace mvc.Controllers
 
         public IActionResult Create()
         {
-            return View(
-                new Book
-                {
-                    Author = "Author Name",
-                    Name = "i know, this should be Title",
-                }
-                );
+            return View();
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("Name,Author")] Book book)
+        public async Task<IActionResult> Create([Bind("Name,Author,Price,Stock")] Book book)
         {
             if (ModelState.IsValid)
             {
@@ -133,7 +127,7 @@ namespace mvc.Controllers
             return View(book);
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, [Bind("Id, Author, Name")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id, Author, Name, Price, Stock")] Book book)
         {
             System.Console.WriteLine(book);
             if (id != book.Id)
@@ -144,6 +138,7 @@ namespace mvc.Controllers
             {
                 try
                 {
+                    book.DateModified=DateTime.Now;
                     _db.Update(book);
                     await _db.SaveChangesAsync();
                 }
@@ -172,6 +167,9 @@ namespace mvc.Controllers
     
         [HttpGet]
         public IActionResult Download(){
+            if(!_db.Book.Any()){
+                return RedirectToAction("Index");
+            }
             using(ExcelPackage excelPackage = new ExcelPackage())
             {
                 List<Book> books = _db.Book.ToList();
@@ -203,6 +201,13 @@ namespace mvc.Controllers
             }
         }
 
-
+        public IActionResult Price(){
+            return View(
+                _db.Book
+                    .OrderByDescending(x=>x.Price)
+                    .Take(5)
+                    .ToList()
+                );
+        }
     }
 }

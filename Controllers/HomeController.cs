@@ -20,7 +20,7 @@ namespace mvc.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            return RedirectToAction("Price","Book");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
