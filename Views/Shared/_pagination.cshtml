@@ -1,0 +1,33 @@
+@model Pagination
+@{
+    
+    static string getHref(Pagination mod,int p){
+        return mod.Path+"?page="+p.ToString()+"&limit="+mod.Limit.ToString();
+    }
+}
+
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+        @{string prev = @Model.HasPreviousPage() ? "page-item" : "page-item disabled";}
+        <li class="@prev">
+            <a class="page-link" href=@getHref(Model, Model.Page-1) tabindex="-1"><<</a>
+        </li>
+    @for(int p=1; p<=Model.TotalPage;p++ ){
+        
+        if(p==Model.Page){
+            <li class="page-item active">
+                <a class="page-link" href="#">@p <span class="sr-only">(current)</span></a>
+            </li>
+        }
+        else {
+            <li class="page-item"><a class="page-link" href=@getHref(Model,p)>@p</a></li>
+        }
+    }
+        @{string next = @Model.HasNextPage() ? "page-item" : "page-item disabled";}
+        <li @Model.HasNextPage() ? class="@next">
+            <a class="page-link" href=@getHref(Model,Model.Page+1)>>></a>
+        </li>
+
+
+  </ul>
+</nav>

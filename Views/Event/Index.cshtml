@@ -1,0 +1,90 @@
+﻿@model mvc.Models.Event.PaginateEvent
+
+@{
+    ViewData["Title"] = "Event";
+}
+
+<h2>Event List</h2>
+<p>
+    <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateEvent")" data-url="@Url.Action($"Create","Book")">Create</button>
+    @await Html.PartialAsync("Modal/_CreateEvent",new mvc.Models.Event.Event())
+</p>
+<div class="row">
+    <div class="col">
+        <form asp-controller="Book" asp-action="Index">
+            <div class="input-group col">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">keyword</span>
+                </div>
+
+                <input type="text" class="form-control" placeholder="search by author or book title" aria-describedby="basic-addon2" name="search" asp-for="@Model.Pagination.Search">
+
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-sm-2">
+        <a asp-action="Download" class="btn btn-primary">Download</a>
+    </div>
+</div>
+
+
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(name => Model.Event.First().Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Event.First().Type)
+            </th>
+            <th>
+                Date Start
+            </th>
+            <th>
+                Date End
+            </th>
+
+        </tr>
+
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Event)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.getStartDate())
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.getEndDate())
+                </td>
+                <td>
+                    <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditEvent-" + item.Guid)" data-url="@Url.Action($"Edit","Event",item.Guid)">Edit</a>
+                    @await Html.PartialAsync("_EditEvent", item)
+                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteEvent-" + item.Guid)" data-url="@Url.Action($"Delete","Event",item.Guid)">Delete</a>
+                    @await Html.PartialAsync("_DeleteEvent",item)
+
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
+@Html.Partial("_pagination",Model.Pagination)

@@ -1,0 +1,74 @@
+﻿@model mvc.Models.Event.PaginateType
+
+@{
+    ViewData["Title"] = "Type";
+}
+
+<h2>Type List</h2>
+<p>
+    <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateType")" data-url="@Url.Action($"Create","Book")">Create</button>
+    @await Html.PartialAsync("Modal/_CreateType",new mvc.Models.Event.EventType())
+</p>
+<div class="row">
+    <div class="col">
+        <form asp-controller="Book" asp-action="Index">
+            <div class="input-group col">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">keyword</span>
+                </div>
+
+                <input type="text" class="form-control" placeholder="search by author or book title" aria-describedby="basic-addon2" name="search" asp-for="@Model.Pagination.Search">
+
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-sm-2">
+        <a asp-action="Download" class="btn btn-primary">Download</a>
+    </div>
+</div>
+
+
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(name => Model.EventType.First().Name)
+            </th>
+
+        </tr>
+
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model.EventType)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditType-" + item.Guid)" data-url="@Url.Action($"Edit","Type",item.Guid)">Edit</a>
+                    @await Html.PartialAsync("_EditType", item)
+                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteType-" + item.Guid)" data-url="@Url.Action($"Delete","Type",item.Guid)">Delete</a>
+                    @await Html.PartialAsync("_DeleteType",item)
+
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
+@Html.Partial("_pagination",Model.Pagination)
+
+

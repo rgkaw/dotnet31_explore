@@ -1,0 +1,11 @@
+7/6/2023 23:53:52 :: Occurance of 'PRO' NOT found.Proceed with installation.
+7/6/2023 23:53:52 :: Installation can CONTINUE. Processor : Intel(R) Core(TM) i3-10105F CPU @ 3.70GHz Manufacturer : Micro-Star International Co., Ltd.
+7/6/2023 11:53:58 PM :: Function RemoveAMDRMService Started.
+7/6/2023 11:53:58 PM :: Function ReadRegistryKey started.
+7/6/2023 11:53:58 PM :: Function ReadRegistryKey KeyValue is 
+7/6/2023 11:53:58 PM :: Function ReadRegistryKey Ended.
+7/6/2023 11:53:58 PM :: SDK install path as per environment variable : C:\Program Files\AMD\RyzenMasterSDK\
+7/6/2023 11:53:58 PM :: Path from which service runs as per registry : 
+7/6/2023 11:53:58 PM :: Not uninstalling driver service as it does not belong to current installer being removed.
+7/6/2023 11:53:58 PM :: Function RemoveAMDRMService. Minor Upgrade property is : 
+7/6/2023 11:53:58 PM :: Function RemoveAMDRMService Ended.

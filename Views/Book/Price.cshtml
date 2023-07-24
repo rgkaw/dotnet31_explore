@@ -1,0 +1,81 @@
+@model List<Book>
+
+<canvas id="myChart" style="width:100%;max-width:720px;height:100%;max-height:500px"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  	const ctx = document.getElementById('myChart');
+	const data = @Json.Serialize(Model)
+	const label = []
+	const value = []
+	for (i of data){
+		label.push(i.name)
+		value.push(i.price)
+	}
+	new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: label,
+			datasets: [{
+				label: 'Book Price',
+				data: value,
+				borderWidth: 1
+			}]
+		},
+		options: {
+			scales: {
+				y: {
+				beginAtZero: true
+				}
+			}
+		}
+	});
+</script>
+@* 
+<script type="text/javascript">
+    const data = @Json.Serialize(Model)
+	const chart = []
+	for (i of data){
+		chart.push({label:i.author, y: i.price})
+	}
+	var xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
+	var yValues = [55, 49, 44, 24, 15];
+	var barColors = ["red", "green","blue","orange","brown"];
+
+	new Chart("myChart", {
+	type: "bar",
+	data: {
+		labels: xValues,
+		datasets: [{
+		backgroundColor: barColors,
+		data: yValues
+		}]
+	}
+	});
+</script> *@
+
+@* window.onload = function () {
+	var chart = new CanvasJS.Chart("chartContainer", {
+		title:{
+			text: "My First Chart in ASP.NET MVC"
+		},
+		data: [
+		{
+			// Change type to "doughnut", "line", "splineArea", etc.
+			type: "column",
+			dataPoints: [
+				{ label: "apple",  y: 10  },
+				{ label: "orange", y: 15  },
+				{ label: "banana", y: 25  },
+				{ label: "mango",  y: 30  },
+				{ label: "grape",  y: 28  }
+			]
+		}
+		]
+	});
+	chart.render();
+} 
+</script> 
+*@
+
+
+

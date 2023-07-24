@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using mvc.Data;
 
 namespace mvc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230720035309_addBookColumn1")]
+    partial class addBookColumn1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,8 +55,9 @@ namespace mvc.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateModified")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
@@ -62,71 +65,9 @@ namespace mvc.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Book");
-                });
-
-            modelBuilder.Entity("mvc.Models.Event.Event", b =>
-                {
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("TypeGuid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Guid");
-
-                    b.HasIndex("TypeGuid");
-
-                    b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("mvc.Models.Event.EventSchedule", b =>
-                {
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("End")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("EventGuid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Start")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Guid");
-
-                    b.HasIndex("EventGuid");
-
-                    b.ToTable("EventsSchedules");
-                });
-
-            modelBuilder.Entity("mvc.Models.Event.EventType", b =>
-                {
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Guid");
-
-                    b.ToTable("EventTypes");
                 });
 
             modelBuilder.Entity("mvc.Models.User", b =>
@@ -145,20 +86,6 @@ namespace mvc.Migrations
                     b.HasKey("Username");
 
                     b.ToTable("User");
-                });
-
-            modelBuilder.Entity("mvc.Models.Event.Event", b =>
-                {
-                    b.HasOne("mvc.Models.Event.EventType", "Type")
-                        .WithMany("Events")
-                        .HasForeignKey("TypeGuid");
-                });
-
-            modelBuilder.Entity("mvc.Models.Event.EventSchedule", b =>
-                {
-                    b.HasOne("mvc.Models.Event.Event", "Event")
-                        .WithMany("Schedules")
-                        .HasForeignKey("EventGuid");
                 });
 #pragma warning restore 612, 618
         }
