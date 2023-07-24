@@ -1,0 +1,79 @@
+
+@model PaginateAttachment
+@{
+    ViewData["Title"] = "AttachmentList";
+}
+<script>
+    function showSize(size, i=0){
+        const unit = ['B','KB', 'MB','GB','TB']
+        if (size>=1024){
+            i=i+1
+            return showSize(size/1024,i)
+        }
+        return size.toString()+unit[i]
+    }
+</script>
+@{
+    string showSize(string size, int i =0){
+        string[] unit = {"B","KB", "MB","GB","TB"};
+        int n = int.Parse(size);
+        if(n>=1024){
+            i++;
+            return showSize((n/1024).ToString(),i);
+        }
+        return size+unit[i];
+    }
+}
+<h2>AttachmentList</h2>
+<p>
+    <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#UploadAttachment")" data-url="@Url.Action($"Upload","Attachment")">Upload</button>
+    @await Html.PartialAsync("_UploadAttachment", new mvc.Models.DTO.FileUpload())
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(name => Model.Attachment.First().DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Attachment.First().Filename)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Attachment.First().Size)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Attachment.First().Location)
+            </th>
+        </tr>
+    </thead>
+    <tbody>    
+    @foreach (var item in Model.Attachment)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateCreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Filename)
+            </td>
+            @{string size = showSize(item.Size.ToString(),0);}
+            <td>
+                @Html.DisplayFor(modelItem => @size)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Location)
+            </td>
+            
+            <td>
+                <a class= "btn btn-primary"asp-action="Download" asp-route-guid="@item.Guid">Download</a>
+                <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteAttachment-" + item.Guid)" data-url="@Url.Action($"Delete","Attachment",item.Guid)">Delete</a>
+                    @await Html.PartialAsync("_DeleteAttachment",item)
+            </td>
+        </tr>
+    }</tbody>
+</table>
+@await Html.PartialAsync("_pagination",Model.Pagination)
+
+
+

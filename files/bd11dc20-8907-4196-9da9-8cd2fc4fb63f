@@ -1,0 +1,39 @@
+- method: POST
+- endpoint: /api/v2/user/calculate-trx
+- header:
+    content-type: application/json
+    accessToken: {{user's token}}
+    userid: {{user's id}}
+- body:
+```
+{
+    "payment":"totalPembayaran"/"jumlahTopup",
+    "nominal":integer,
+    "tipeWalletTujuan": string,
+    "metodePembayaran": string,
+    "voucherUsed": string
+}
+```
+
+
+- response:
+```
+  code:int,
+  status:string,
+  message:
+  {
+    "nonimalTransaksi": integer,
+    "biayaAdmin":integer,
+    "potongan":integer,
+    "totalTransaksi": integer,
+    "info":string [optional, tidak disertakan jika menggunakan voucher]
+  }
+```
+
+note:
+```
+payment:
+    jenis perhitungan yang digunakan: berdasarkan 'totalBayar' atau 'jumlahTopup'
+nominal di request: 
+    nominal yang diinput user, baik itu totalBayar atau jumlahTopup
+```

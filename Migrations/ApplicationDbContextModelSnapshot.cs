@@ -56,19 +56,92 @@ namespace mvc.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("Price")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Book");
+                });
+
+            modelBuilder.Entity("mvc.Models.Event.Event", b =>
+                {
+                    b.Property<Guid>("Guid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("TypeGuid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Guid");
+
+                    b.HasIndex("TypeGuid");
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("mvc.Models.Event.EventSchedule", b =>
+                {
+                    b.Property<Guid>("Guid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("EventGuid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDoing")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Guid");
+
+                    b.HasIndex("EventGuid");
+
+                    b.ToTable("EventsSchedules");
+                });
+
+            modelBuilder.Entity("mvc.Models.Event.EventType", b =>
+                {
+                    b.Property<Guid>("Guid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Guid");
+
+                    b.ToTable("EventTypes");
                 });
 
             modelBuilder.Entity("mvc.Models.User", b =>
@@ -87,6 +160,20 @@ namespace mvc.Migrations
                     b.HasKey("Username");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("mvc.Models.Event.Event", b =>
+                {
+                    b.HasOne("mvc.Models.Event.EventType", "Type")
+                        .WithMany("Events")
+                        .HasForeignKey("TypeGuid");
+                });
+
+            modelBuilder.Entity("mvc.Models.Event.EventSchedule", b =>
+                {
+                    b.HasOne("mvc.Models.Event.Event", "Event")
+                        .WithMany("Schedules")
+                        .HasForeignKey("EventGuid");
                 });
 #pragma warning restore 612, 618
         }

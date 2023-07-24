@@ -2,74 +2,120 @@
 
 @{
     ViewData["Title"] = "BookList";
+    int id = 0;
 }
 
 <h2>BookList</h2>
 <p>
-    <a asp-action="Create">Create New</a>
+    <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateBook")" data-url="@Url.Action($"Create","Book")">Create</button>
+    @await Html.PartialAsync("_CreateBook",new Book())
 </p>
+<div class="row">
+    <div class="col">
+        <form asp-controller="Book" asp-action="Index">
+            <div class="input-group col">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">keyword</span>
+                </div>
 
-<a asp-action="Download" class="btn btn-primary">Download</a>
+                <input type="text" class="form-control" placeholder="search by author or book title" aria-describedby="basic-addon2" name="search" asp-for="@Model.Pagination.Search">
+
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-2">
+        <form asp-action="Download" method="get">
+            <input type="hidden" name="limit"value=@Model.Pagination.Limit />
+            <input type="hidden" name="page"value=@Model.Pagination.Page />
+            <input type="hidden" name="search" value=@Model.Pagination.Search />
+            <input type="submit" value="Download This Page" class="btn btn-primary" />
+        </form>
+    </div>
+    <div class="col-sm-2">
+        <form asp-action="Download" method="get">
+            <input type="submit" value="Download All" class="btn btn-primary" />
+        </form>
+    </div>
+</div>
+
+
+
+<!-- Button trigger modal -->
+<!-- Modal -->
 
 
 <table class="table">
     <thead>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().Id)
-        </th>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().Author)
-        </th>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().Stock)
-        </th>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().Price)
-        </th>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().DateCreated)
-        </th>
-        <th>
-            @Html.DisplayNameFor(name => Model.Book.First().DateModified)
-        </th>
-        
-    </thead>
-    <tbody>    
-    @foreach (var item in Model.Book)
-    {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateCreated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateModified)
-            </td>
-            <td>
-                <a class= "btn btn-primary"asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().Stock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(name => Model.Book.First().DateModified)
+            </th>
         </tr>
-    }</tbody>
+
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Book)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Stock)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateCreated)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateModified)
+                </td>
+                <td>
+                    @{
+                        id = @item.Id;
+                    }
+                    <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditBook-" + item.Id)" data-url="@Url.Action($"Edit","Book",item.Id)">Edit</a>
+                    @await Html.PartialAsync("_EditBook", item)
+                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteBook-" + item.Id)" data-url="@Url.Action($"Delete","Book",item.Id)">Delete</a>
+                    @await Html.PartialAsync("_DeleteBook",item)
+
+                </td>
+            </tr>
+        }
+    </tbody>
 
 </table>
-@Html.Partial("_pagination",Model.Pagination)
+
+@await Html.PartialAsync("_pagination",Model.Pagination)
 
 

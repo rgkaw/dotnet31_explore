@@ -1,3 +1,4 @@
+using mvc.Models.Event;
 using Microsoft.EntityFrameworkCore;
 using mvc.Models;
 
@@ -14,6 +15,9 @@ namespace mvc.Data
         public DbSet<User> User { get; set; }
 
         public DbSet<Attachment> Attachment {get;set;}
-
+        
+        public DbSet<EventType> EventTypes { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventSchedule> EventsSchedules { get; set; }
     }
 }

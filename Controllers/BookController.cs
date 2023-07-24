@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using mvc.Data;
 using mvc.Models;
 using OfficeOpenXml;
@@ -39,10 +40,9 @@ namespace mvc.Controllers
             return Ok(book);
         }
         // GET: id
-        public IActionResult Index([FromQuery(Name = "id")] int? id, [FromQuery(Name = "name")] string name, [FromQuery(Name = "author")] string author, int page = 1, int limit =5)
+        public IActionResult Index([FromQuery(Name = "id")] int? id, string search, int page = 1, int limit =5)
         {
-            HttpContext.Request.Headers.Add("Authorization", Request.Cookies["accessToken"]);
-
+            
             if (id != null)
             {
                 if (!_db.Book.Any(x => x.Id == id))
@@ -61,33 +61,42 @@ namespace mvc.Controllers
                         Page = page,
                         Limit = limit,
                         ItemCount = book.Count(),
-                        TotalPage = 1
+                        TotalPage = 1,
+                        Search= search
                     }
                 };
                 return View(pb);
             }
-            List<Book> books = _db.Book
-                .Skip((page -1)*limit)
-                .Take(limit)
-                .ToList();
-            var totalItem = _db.Book.Count();
+            IQueryable<Book> books = _db.Book.AsQueryable();
+            if (!search.IsNullOrEmpty()) {
+                books = books.Where(x =>
+                x.Title.Contains(search) ||
+                x.Author.Contains(search)
+                );
+            }
+            var totalItem = books.Count();
             var totalPages = (int)Math.Ceiling((double)totalItem / (double)limit);
+            books = books
+                .Skip((page - 1) * limit)
+                .Take(limit);
+            
             PaginateBook pbs = new PaginateBook
             {
-                Pagination = new Pagination { Page = page, Limit = limit, ItemCount = totalItem, TotalPage=totalPages },
-                Book = books
+                Pagination = new Pagination { Page = page, Limit = limit, ItemCount = totalItem, TotalPage=totalPages, Search=search },
+                Book = books.ToList()
             };
             return View(pbs);
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return PartialView("_CreateBook");
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("Name,Author,Price,Stock")] Book book)
+        public async Task<IActionResult> Create([Bind("Title,Author,Price,Stock")] Book book)
         {
             if (ModelState.IsValid)
             {
@@ -105,7 +114,7 @@ namespace mvc.Controllers
             {
                 return NotFound();
             }
-            return View(model);
+            return PartialView("_DeleteBook", model);
 
         }
         [HttpPost, ActionName("Delete")]
@@ -122,15 +131,15 @@ namespace mvc.Controllers
             var book = await _db.Book.FindAsync(id);
             if (book == null)
             {
-                return NotFound();
+                return View("List");
             }
-            return View(book);
+            return PartialView(book);
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, [Bind("Id, Author, Name, Price, Stock")] Book book)
+        public async Task<IActionResult> Edit([Bind("Id, Author, Title, Price, Stock")] Book book)
         {
             System.Console.WriteLine(book);
-            if (id != book.Id)
+            if (!_db.Book.Any(x=>x.Id==book.Id))
             {
                 return NotFound();
             }
@@ -166,13 +175,38 @@ namespace mvc.Controllers
 
     
         [HttpGet]
-        public IActionResult Download(){
-            if(!_db.Book.Any()){
+        public IActionResult Download(string search, int page, int limit)
+        {
+            if (!_db.Book.Any()){
                 return RedirectToAction("Index");
             }
-            using(ExcelPackage excelPackage = new ExcelPackage())
+            IQueryable<Book> ibooks = _db.Book.AsQueryable();
+            if ((!search.IsNullOrEmpty()) || (!string.IsNullOrWhiteSpace(search)))
             {
-                List<Book> books = _db.Book.ToList();
+                ibooks = ibooks.Where(x=>
+                x.Title == search ||
+                x.Author == search);
+            }
+            if (page<=0)
+            {
+                page = 1;
+            }
+            if (limit > 0)
+            {
+                ibooks = ibooks
+                .Skip((page - 1) * limit)
+                .Take(limit);
+            }
+            else
+            {
+                limit = ibooks.Count();
+            }
+            var totalItem = ibooks.Count();
+            var totalPages = (int)Math.Ceiling((double)totalItem / (double)limit);
+            List < Book > books = ibooks.ToList();
+            using (ExcelPackage excelPackage = new ExcelPackage())
+            {
+                Console.WriteLine(books.Count());
                 string filename= "Table_List";
                 ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(filename);
                 if(!books.Any()){
@@ -183,14 +217,16 @@ namespace mvc.Controllers
                 foreach(var prop in books.First().GetType().GetProperties()){
                     worksheet.Cells[1,i].Value=prop.Name;
                     i++;
+                    Console.WriteLine(i);
                 }
-                for(i = 2; i<books.Count;i++)
+                for(i = 0; i<books.Count;i++)
                 {
                     PropertyInfo[] prop = books[i].GetType().GetProperties();
                     int j=1;
                     foreach(var val in prop){
-                        worksheet.Cells[i,j].Value=val.GetValue(books[i],null).ToString();
+                        worksheet.Cells[i+2,j].Value=val.GetValue(books[i],null).ToString();
                         j++;
+                        Console.WriteLine(i.ToString()+j.ToString());
                     }
                 }
                 MemoryStream stream = new MemoryStream();
