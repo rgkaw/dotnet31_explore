@@ -6,7 +6,11 @@
 
 <h2>Event List</h2>
 <p>
+<<<<<<< HEAD
     <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateEvent")" data-url="@Url.Action($"CreateEvent","Event")">Create</button>
+=======
+    <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateEvent")" data-url="@Url.Action($"Create","Book")">Create</button>
+>>>>>>> 8ac92f2ed286e6574bcbd961b8414e3f9dc61a35
     @await Html.PartialAsync("Modal/_CreateEvent",new mvc.Models.Event.Event())
 </p>
 <div class="row">
@@ -47,10 +51,17 @@
                 @Html.DisplayNameFor(name => Model.Event.First().Type)
             </th>
             <th>
+<<<<<<< HEAD
                 @Html.DisplayNameFor(name => Model.Event.First().StartDate)
             </th>
             <th>
                 @Html.DisplayNameFor(name => Model.Event.First().EndDate)
+=======
+                Date Start
+            </th>
+            <th>
+                Date End
+>>>>>>> 8ac92f2ed286e6574bcbd961b8414e3f9dc61a35
             </th>
 
         </tr>
@@ -65,6 +76,7 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
+<<<<<<< HEAD
                     @Html.DisplayFor(modelItem => item.Type.Name)
                 </td>
                 <td>
@@ -82,6 +94,21 @@
                         <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteEvent-" + item.Guid)" data-url="@Url.Action($"Delete","Event",item.Guid)">Delete</a>
                         @await Html.PartialAsync("Modal/_ConfirmDelete",item)
                     </form>
+=======
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.getStartDate())
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.getEndDate())
+                </td>
+                <td>
+                    <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditEvent-" + item.Guid)" data-url="@Url.Action($"Edit","Event",item.Guid)">Edit</a>
+                    @await Html.PartialAsync("_EditEvent", item)
+                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteEvent-" + item.Guid)" data-url="@Url.Action($"Delete","Event",item.Guid)">Delete</a>
+                    @await Html.PartialAsync("_DeleteEvent",item)
+>>>>>>> 8ac92f2ed286e6574bcbd961b8414e3f9dc61a35
 
                 </td>
             </tr>
