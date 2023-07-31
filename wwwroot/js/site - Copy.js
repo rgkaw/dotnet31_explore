@@ -1,11 +1,14 @@
-﻿jQuery(document).ready(function ($) {
+﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+// for details on configuring this project to bundle and minify static web assets.
+
+// Write your JavaScript code.
+jQuery(document).ready(function ($) {
 	var timelines = $('.cd-horizontal-timeline'),
 		eventsMinDistance = 60;
 
 	(timelines.length > 0) && initTimeline(timelines);
 
 	function initTimeline(timelines) {
-		console.log('initTimeline');
 		timelines.each(function () {
 			var timeline = $(this),
 				timelineComponents = {};
@@ -18,14 +21,10 @@
 			timelineComponents['eventsMinLapse'] = minLapse(timelineComponents['timelineDates']);
 			timelineComponents['timelineNavigation'] = timeline.find('.cd-timeline-navigation');
 			timelineComponents['eventsContent'] = timeline.children('.events-content');
-
 			//assign a left postion to the single events along the timeline
 			setDatePosition(timelineComponents, eventsMinDistance);
 			//assign a width to the timeline
 			var timelineTotWidth = setTimelineWidth(timelineComponents, eventsMinDistance);
-			if (!timelineTotWidth) {
-				timelineComponents['timelineNavigation'].find('.next').addClass('inactive');
-			} 
 			//the timeline has been initialize - show it
 			timeline.addClass('loaded');
 
@@ -58,6 +57,7 @@
 				var mq = checkMQ();
 				(mq == 'mobile') && showNewContent(timelineComponents, timelineTotWidth, 'prev');
 			});
+
 			//keyboard navigation
 			$(document).keyup(function (event) {
 				if (event.which == '37' && elementInViewport(timeline.get(0))) {
@@ -70,25 +70,20 @@
 	}
 
 	function updateSlide(timelineComponents, timelineTotWidth, string) {
-		console.log('updateSlide');
 		//retrieve translateX value of timelineComponents['eventsWrapper']
 		var translateValue = getTranslateValue(timelineComponents['eventsWrapper']),
 			wrapperWidth = Number(timelineComponents['timelineWrapper'].css('width').replace('px', ''));
 		//translate the timeline to the left('next')/right('prev') 
-		if (timelineTotWidth) {
-			(string == 'next')
-				? translateTimeline(timelineComponents, translateValue - wrapperWidth + eventsMinDistance, wrapperWidth - timelineTotWidth)
-				: translateTimeline(timelineComponents, translateValue + wrapperWidth - eventsMinDistance);
-		}
-
+		(string == 'next')
+			? translateTimeline(timelineComponents, translateValue - wrapperWidth + eventsMinDistance, wrapperWidth - timelineTotWidth)
+			: translateTimeline(timelineComponents, translateValue + wrapperWidth - eventsMinDistance);
 	}
 
 	function showNewContent(timelineComponents, timelineTotWidth, string) {
-		console.log('showNewContent');
 		//go from one event to the next/previous one
 		var visibleContent = timelineComponents['eventsContent'].find('.selected'),
 			newContent = (string == 'next') ? visibleContent.next() : visibleContent.prev();
-			console.log(visibleContent)
+
 		if (newContent.length > 0) { //if there's a next/prev event - show it
 			var selectedDate = timelineComponents['eventsWrapper'].find('.selected'),
 				newEvent = (string == 'next') ? selectedDate.parent('li').next('li').children('a') : selectedDate.parent('li').prev('li').children('a');
@@ -103,32 +98,28 @@
 	}
 
 	function updateTimelinePosition(string, event, timelineComponents) {
-		console.log('updateTimelinePosition');
 		//translate timeline to the left/right according to the position of the selected event
 		var eventStyle = window.getComputedStyle(event.get(0), null),
 			eventLeft = Number(eventStyle.getPropertyValue("left").replace('px', '')),
 			timelineWidth = Number(timelineComponents['timelineWrapper'].css('width').replace('px', '')),
 			timelineTotWidth = Number(timelineComponents['eventsWrapper'].css('width').replace('px', ''));
 		var timelineTranslate = getTranslateValue(timelineComponents['eventsWrapper']);
-
 		if ((string == 'next' && eventLeft > timelineWidth - timelineTranslate) || (string == 'prev' && eventLeft < - timelineTranslate)) {
 			translateTimeline(timelineComponents, - eventLeft + timelineWidth / 2, timelineWidth - timelineTotWidth);
 		}
 	}
 
 	function translateTimeline(timelineComponents, value, totWidth) {
-		console.log('translateTimeline');
 		var eventsWrapper = timelineComponents['eventsWrapper'].get(0);
 		value = (value > 0) ? 0 : value; //only negative translate value
 		value = (!(typeof totWidth === 'undefined') && value < totWidth) ? totWidth : value; //do not translate more than timeline width
 		setTransformValue(eventsWrapper, 'translateX', value + 'px');
 		//update navigation arrows visibility
 		(value == 0) ? timelineComponents['timelineNavigation'].find('.prev').addClass('inactive') : timelineComponents['timelineNavigation'].find('.prev').removeClass('inactive');
-		(value == totWidth || totWidth == NaN || typeof totWidth === 'undefined') ? timelineComponents['timelineNavigation'].find('.next').addClass('inactive') : timelineComponents['timelineNavigation'].find('.next').removeClass('inactive');
+		(value == totWidth) ? timelineComponents['timelineNavigation'].find('.next').addClass('inactive') : timelineComponents['timelineNavigation'].find('.next').removeClass('inactive');
 	}
 
 	function updateFilling(selectedEvent, filling, totWidth) {
-		console.log('updateFilling');
 		//change .filling-line length according to the selected event
 		var eventStyle = window.getComputedStyle(selectedEvent.get(0), null),
 			eventLeft = eventStyle.getPropertyValue("left"),
@@ -139,7 +130,6 @@
 	}
 
 	function setDatePosition(timelineComponents, min) {
-		console.log('setDatePosition');
 		for (i = 0; i < timelineComponents['timelineDates'].length; i++) {
 			var distance = daydiff(timelineComponents['timelineDates'][0], timelineComponents['timelineDates'][i]),
 				distanceNorm = Math.round(distance / timelineComponents['eventsMinLapse']) + 2;
@@ -148,25 +138,24 @@
 	}
 
 	function setTimelineWidth(timelineComponents, width) {
-		console.log('setTimelineWidth');
 		var timeSpan = daydiff(timelineComponents['timelineDates'][0], timelineComponents['timelineDates'][timelineComponents['timelineDates'].length - 1]),
 			timeSpanNorm = timeSpan / timelineComponents['eventsMinLapse'],
 			timeSpanNorm = Math.round(timeSpanNorm) + 4,
 			totalWidth = timeSpanNorm * width;
 		timelineComponents['eventsWrapper'].css('width', totalWidth + 'px');
 		updateFilling(timelineComponents['eventsWrapper'].find('a.selected'), timelineComponents['fillingLine'], totalWidth);
+
 		updateTimelinePosition('next', timelineComponents['eventsWrapper'].find('a.selected'), timelineComponents);
 
 		return totalWidth;
 	}
 
 	function updateVisibleContent(event, eventsContent) {
-		console.log('updateVisibleContent');
 		var eventDate = event.data('date'),
 			visibleContent = eventsContent.find('.selected'),
 			selectedContent = eventsContent.find('[data-date="' + eventDate + '"]'),
 			selectedContentHeight = selectedContent.height();
-		console.log(selectedContent.index() , visibleContent.index())
+
 		if (selectedContent.index() > visibleContent.index()) {
 			var classEnetering = 'selected enter-right',
 				classLeaving = 'leave-left';
@@ -174,10 +163,8 @@
 			var classEnetering = 'selected enter-left',
 				classLeaving = 'leave-right';
 		}
-		console.log(selectedContent);
+
 		selectedContent.attr('class', classEnetering);
-		console.log(selectedContent);
-		console.log(visibleContent);
 		visibleContent.attr('class', classLeaving).one('webkitAnimationEnd oanimationend msAnimationEnd animationend', function () {
 			visibleContent.removeClass('leave-right leave-left');
 			selectedContent.removeClass('enter-left enter-right');
@@ -186,12 +173,10 @@
 	}
 
 	function updateOlderEvents(event) {
-		console.log('updateOlderEvents');
 		event.parent('li').prevAll('li').children('a').addClass('older-event').end().end().nextAll('li').children('a').removeClass('older-event');
 	}
 
 	function getTranslateValue(timeline) {
-		console.log('getTranslateValue');
 		var timelineStyle = window.getComputedStyle(timeline.get(0), null),
 			timelineTranslate = timelineStyle.getPropertyValue("-webkit-transform") ||
 				timelineStyle.getPropertyValue("-moz-transform") ||
@@ -212,7 +197,6 @@
 	}
 
 	function setTransformValue(element, property, value) {
-		console.log('setTransformValue');
 		element.style["-webkit-transform"] = property + "(" + value + ")";
 		element.style["-moz-transform"] = property + "(" + value + ")";
 		element.style["-ms-transform"] = property + "(" + value + ")";
@@ -222,7 +206,6 @@
 
 	//based on http://stackoverflow.com/questions/542938/how-do-i-get-the-number-of-days-between-two-dates-in-javascript
 	function parseDate(events) {
-		console.log('parseDate');
 		var dateArrays = [];
 		events.each(function () {
 			var singleDate = $(this),

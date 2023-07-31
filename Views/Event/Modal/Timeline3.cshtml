@@ -6,13 +6,11 @@
 }
 @{
     //nextPx=120
-    int width = 120 + (Model.EventSchedules.Count * 144);
-    string size = (width>=720? width:720).ToString()+"px";
     int nextPx = 120;
     string calcPx()
     {
         string retVal = nextPx.ToString() + "px";
-        nextPx += 144;
+        nextPx += 180;
         return retVal;
     }
 }
@@ -25,7 +23,7 @@
                     <div class="cd-horizontal-timeline loaded">
                         <div class="timeline">
                             <div class="events-wrapper">
-                                <div class="events" style="width: @size;">
+                                <div class="events" style="width: 1800px;">
                                     <ol>
                                         @foreach (var item in Model.EventSchedules)
                                         {
@@ -34,7 +32,6 @@
                                             </li>
                                         }
                                     </ol>
-                                    <span class="filling-line" aria-hidden="true" style="transform: scaleX(0.6);"></span>
                                 </div>
                                 <!--.event-->
                             </div>
@@ -46,28 +43,16 @@
                                 </li>
                             </ul>
                         </div>
-                        <!--.timeline-->
+                        <!--timeline-->
                         <div class="events-content" style="height: 225px;">
                             <ol>
                                 @foreach (var item in Model.EventSchedules)
                                 {
-                                    if (item.IsDoing)
-                                    {
-                                        <li class="selected" data-date="@item.End.ToString("dd-MM-yyyy")">
-                                            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
-                                            <hr>
-                                            <p>@item.Description <br /></p>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li data-date="@item.End.ToString("dd-MM-yyyy")">
-                                            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
-                                            <hr>
-                                            <p>@item.Description <br /></p>
-                                        </li>
-                                    }
-
+                                    <li class="" data-date="@item.End.ToString("dd/mm/yyyy")">
+                                        <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
+                                        <hr>
+                                        <p>@item.Description <br /></p>
+                                    </li>
                                 }
                             </ol>
                         </div>

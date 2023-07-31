@@ -99,51 +99,6 @@ namespace mvc.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("mvc.Models.Event.EventSchedule", b =>
-                {
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("End")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("EventGuid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDoing")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Start")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Guid");
-
-                    b.HasIndex("EventGuid");
-
-                    b.ToTable("EventsSchedules");
-                });
-
-            modelBuilder.Entity("mvc.Models.Event.EventType", b =>
-                {
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Guid");
-
-                    b.ToTable("EventTypes");
-                });
-
             modelBuilder.Entity("mvc.Models.User", b =>
                 {
                     b.Property<string>("Username")
