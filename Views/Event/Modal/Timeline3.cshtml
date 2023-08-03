@@ -6,15 +6,17 @@
 }
 @{
     //nextPx=120
-    int nextPx = 120;
+    int width = 0 + (Model.EventSchedules.Count * 144);
+    string size = (width>=720? width:720).ToString()+"px";
+    int nextPx = 0;
     string calcPx()
     {
         string retVal = nextPx.ToString() + "px";
-        nextPx += 180;
+        nextPx += 144;
         return retVal;
     }
 }
-
+<!DOCTYPE html>
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
@@ -23,15 +25,16 @@
                     <div class="cd-horizontal-timeline loaded">
                         <div class="timeline">
                             <div class="events-wrapper">
-                                <div class="events" style="width: 1800px;">
+                                <div class="events" style="width: @size;">
                                     <ol>
                                         @foreach (var item in Model.EventSchedules)
                                         {
                                             <li>
-                                                <a href="#0" data-date="@item.End.ToString("dd-MM-yyyy")" @(item.IsDoing ? "class=selected" : (item.IsCompleted ? "class=older-event" : "")) style="left: @calcPx();">@item.End.ToString("dd-MMM").Replace("-", " ")</a>
+                                                <a href="#0" data-date="@item.End.ToString("dd/MM/yyyy")" @(item.IsDoing ? "class=selected" : (item.IsCompleted ? "class=older-event" : "")) style="left: @calcPx();">@item.End.ToString("dd-MMM").Replace("-", " ")</a>
                                             </li>
                                         }
                                     </ol>
+                                    <span class="filling-line" aria-hidden="true" style="transform: scaleX(0.8);"></span>
                                 </div>
                                 <!--.event-->
                             </div>
@@ -43,16 +46,28 @@
                                 </li>
                             </ul>
                         </div>
-                        <!--timeline-->
+                        <!--.timeline-->
                         <div class="events-content" style="height: 225px;">
                             <ol>
                                 @foreach (var item in Model.EventSchedules)
                                 {
-                                    <li class="" data-date="@item.End.ToString("dd/mm/yyyy")">
-                                        <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
-                                        <hr>
-                                        <p>@item.Description <br /></p>
-                                    </li>
+                                    if (item.IsDoing)
+                                    {
+                                        <li class="selected" data-date="@item.End.ToString("dd/MM/yyyy")">
+                                            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
+                                            <hr>
+                                            <p>@item.Description <br /></p>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li data-date="@item.End.ToString("dd/MM/yyyy")">
+                                            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
+                                            <hr>
+                                            <p>@item.Description <br /></p>
+                                        </li>
+                                    }
+
                                 }
                             </ol>
                         </div>

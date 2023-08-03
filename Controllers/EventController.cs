@@ -40,7 +40,8 @@ namespace mvc.Controllers
         [HttpGet]
         public IActionResult CreateType() 
         {
-            return View();
+            Console.WriteLine("sampai disini saja");
+            return PartialView("Modal/_CreateType");
         }
         [HttpPost]
         public async Task<IActionResult> CreateType(EventType EventType) 
@@ -126,6 +127,9 @@ namespace mvc.Controllers
 
         public IActionResult Timeline(string EventId)
         {
+            if(string.IsNullOrEmpty(EventId)){
+                return RedirectToAction("Index");
+            }
             return View(new PaginateEventSchedule 
             { 
                 Pagination = new Pagination(),

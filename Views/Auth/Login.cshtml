@@ -3,33 +3,36 @@
 @{
     ViewData["Title"] = "Login";
 }
+<div class="container justify-content-center d-flex">
+    <div style="width: 480px; height: 600px">
+        <form asp-action="Login"> 
+            <!-- Username input -->
+            <div class="form-outline mb-4">
+                <label class="form-label" asp-for="Username">Username</label>
+                <input type="text" asp-for="Username" id="loginUsername" class="form-control" />
+            </div>
+            <!-- Password input -->
+            <div class="form-outline mb-4">
+                <label class="form-label" asp-for="Password">Password</label>
+                <input type="password" asp-for="Password" id="loginPassword" class="form-control" />
+                
+            </div>
+            <div class="help-block text-danger" asp-validation-summary="All"></div>
+            <!-- 2 column grid layout for inline styling -->
+            <div class="row mb-4">
+                <div class="col">
+                    <!-- Simple link -->
+                    <a href="#!">Forgot password?</a>
+                </div>
+            </div>
 
-<form asp-action="Login"> 
-    <!-- Username input -->
-    <div class="form-outline mb-4">
-        <input type="text" asp-for="Username" id="loginUsername" class="form-control" />
-        <label class="form-label" asp-for="Username">Username</label>
-    </div>
+            <!-- Submit button -->
+            <button type="submit" value="Login" class="btn btn-primary btn-block mb-4">Login</button>
 
-    <!-- Password input -->
-    <div class="form-outline mb-4">
-        <input type="password" asp-for="Password" id="loginPassword" class="form-control" />
-        <label class="form-label" asp-for="Password">Password</label>
+            <!-- Register buttons -->
+            <div class="text-center">
+                <p>Not a member? <a href="/Auth/Register">Register</a></p>
+            </div>
+        </form>
     </div>
-    <div class="help-block text-danger" asp-validation-summary="All"></div>
-    <!-- 2 column grid layout for inline styling -->
-    <div class="row mb-4">
-        <div class="col">
-            <!-- Simple link -->
-            <a href="#!">Forgot password?</a>
-        </div>
-    </div>
-
-    <!-- Submit button -->
-    <button type="submit" value="Login" class="btn btn-primary btn-block mb-4">Login</button>
-
-    <!-- Register buttons -->
-    <div class="text-center">
-        <p>Not a member? <a href="/Auth/Register">Register</a></p>
-    </div>
-</form>
+</div>

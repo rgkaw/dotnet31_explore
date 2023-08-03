@@ -14,7 +14,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using static System.Reflection.Metadata.BlobBuilder;
-
 namespace mvc.Controllers
 {
     [Authorize]
@@ -40,40 +39,20 @@ namespace mvc.Controllers
             return Ok(book);
         }
         // GET: id
-        public IActionResult Index([FromQuery(Name = "id")] int? id, string search, int page = 1, int limit =5)
+        public IActionResult Index(string search, int page = 1, int limit =5, string orderBy ="DateCreated", string desc="")
         {
-            
-            if (id != null)
-            {
-                if (!_db.Book.Any(x => x.Id == id))
-                {
-                    return NotFound("Not Found");
-                }
-                List<Book> book = new List<Book>
-                {
-                    _db.Book.FirstOrDefault(x => x.Id == id)
+            string query="select * from Book where 1=1";
+            if(!search.IsNullOrEmpty()){
+                    var searchStr="'%"+search+"%'";
+                    query+="and (";
+                    query+=" Author like "+searchStr;
+                    query+=" or Title like "+searchStr;
+                    query+=")";
+            }
+            query+=" order by "+orderBy+" "+desc+"OFFSET 0 ROWS";
+            Console.WriteLine(query);
+            IQueryable<Book> books = _db.Book.FromSqlRaw(query);
 
-                };
-                PaginateBook pb = new PaginateBook
-                {
-                    Pagination = new Pagination
-                    {
-                        Page = page,
-                        Limit = limit,
-                        ItemCount = book.Count(),
-                        TotalPage = 1,
-                        Search= search
-                    }
-                };
-                return View(pb);
-            }
-            IQueryable<Book> books = _db.Book.AsQueryable();
-            if (!search.IsNullOrEmpty()) {
-                books = books.Where(x =>
-                x.Title.Contains(search) ||
-                x.Author.Contains(search)
-                );
-            }
             var totalItem = books.Count();
             var totalPages = (int)Math.Ceiling((double)totalItem / (double)limit);
             books = books
@@ -102,9 +81,13 @@ namespace mvc.Controllers
             {
                 _db.Book.Add(book);
                 await _db.SaveChangesAsync();
+                ViewBag.Message = "Sucess or Failure Message";
+                ModelState.Clear();
                 return RedirectToAction(nameof(Index));
+
             }
-            return View(book);
+            
+            return PartialView("_CreateBook", book);
         }
 
         public async Task<IActionResult> Delete(int? id)
@@ -166,7 +149,7 @@ namespace mvc.Controllers
             }
             return View(book);
         }
-
+        
         private bool BookExists(int? id)
         {
             return _db.Book.Any(e => e.Id == id);

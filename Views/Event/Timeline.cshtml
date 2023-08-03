@@ -2,21 +2,23 @@
 
 @{
     ViewData["Title"] = "Timeline";
-
 }
 @{
     //nextPx=120
-    int width = 120 + (Model.EventSchedules.Count * 144);
+    int width = (Model.EventSchedules.Count * 144);
     string size = (width>=720? width:720).ToString()+"px";
-    int nextPx = 120;
+    int nextPx = 0;
     string calcPx()
     {
         string retVal = nextPx.ToString() + "px";
         nextPx += 144;
         return retVal;
     }
+    string doingPos;
+    string pos;
+    bool[] done = new bool[Model.EventSchedules.Count];
 }
-
+<!DOCTYPE html>
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
@@ -30,11 +32,20 @@
                                         @foreach (var item in Model.EventSchedules)
                                         {
                                             <li>
-                                                <a href="#0" data-date="@item.End.ToString("dd-MM-yyyy")" @(item.IsDoing ? "class=selected" : (item.IsCompleted ? "class=older-event" : "")) style="left: @calcPx();">@item.End.ToString("dd-MMM").Replace("-", " ")</a>
+                                                @if(item.IsDoing){
+                                                    doingPos=calcPx();
+                                                    pos=doingPos;
+                                                }else{
+                                                    pos=calcPx();
+                                                }
+                                                <a href="#0" data-date="@item.Start.ToString("dd/MM/yyyy")" @(item.IsDoing ? "class=selected" : (item.IsCompleted ? "class=older-event" : "")) style="left: @pos;">@item.Start.ToString("dd-MMM").Replace("-", " ")
+                                                <br>
+
+                                                </a>
                                             </li>
                                         }
                                     </ol>
-                                    <span class="filling-line" aria-hidden="true" style="transform: scaleX(0.6);"></span>
+                                    <span class="filling-line" aria-hidden="true" style="transform: scaleX(0.8);"></span>
                                 </div>
                                 <!--.event-->
                             </div>
@@ -51,23 +62,11 @@
                             <ol>
                                 @foreach (var item in Model.EventSchedules)
                                 {
-                                    if (item.IsDoing)
-                                    {
-                                        <li class="selected" data-date="@item.End.ToString("dd-MM-yyyy")">
-                                            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
-                                            <hr>
-                                            <p>@item.Description <br /></p>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li data-date="@item.End.ToString("dd-MM-yyyy")">
-                                            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
-                                            <hr>
-                                            <p>@item.Description <br /></p>
-                                        </li>
-                                    }
-
+                                    <li @(item.IsDoing ? "class=selected" : "") data-date="@item.Start.ToString("dd/MM/yyyy")">
+                                        <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
+                                        <hr>
+                                        <p>@item.Description <br /></p>
+                                    </li>
                                 }
                             </ol>
                         </div>
@@ -78,5 +77,3 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="~/js/site.js"></script>

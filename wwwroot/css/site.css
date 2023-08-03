@@ -14,6 +14,10 @@ a.navbar-brand {
 a {
   color: #0366d6;
 }
+.selected-a{
+    color: green !important;
+    font-weight: bold;
+}
 
 .btn-primary {
   color: #fff;
@@ -70,13 +74,11 @@ body {
   bottom: 0;
   width: 100%;
   white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+  line-height: 60px; 
+  /* Vertically center the text there */
 }
 
-body {
-    margin-top: 20px;
-    background: #eee;
-}
+
 
 
 
@@ -128,7 +130,7 @@ body {
 
     .cd-horizontal-timeline .timeline {
         position: relative;
-        height: 100px;
+        height: 120px;
         width: 90%;
         max-width: 800px;
         margin: 0 auto;
@@ -164,7 +166,7 @@ body {
         position: absolute;
         z-index: 1;
         left: 0;
-        top: 50px;
+        top: 60px;
         height: 2px;
         /* width will be set using JavaScript */
         background: #dfdfdf;
@@ -243,10 +245,17 @@ body {
     pointer-events: none;
 }
 
-    .cd-horizontal-timeline .events a.selected::after {
-        background-color: #313740;
-        border-color: #313740;
-    }
+.cd-horizontal-timeline .events a.selected::after {
+    background-color: #313740;
+    border-color: #313740;
+}
+.inner-circle {
+    background-color: #3b82f6;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 6.25rem;
+    opacity: .5;
+}
 
 .cd-horizontal-timeline .events a.older-event::after {
     border-color: #313740;
@@ -552,3 +561,4 @@ body {
     margin-left: -1.5px;
     background-color: #eeeeee;
 }
+

@@ -11,6 +11,7 @@ namespace mvc.Models
 
         [Required]
         public string Title { get; set; } ="";
+        [Required]
         public string Author { get; set; } = "";
         
         public DateTime DateCreated {get; set;} = DateTime.Now;
@@ -26,6 +27,11 @@ namespace mvc.Models
     {
         public Pagination Pagination { get; set; }
         public List<Book> Book { get; set; }
+        public Book Selected {get;set;}
+    }
+
+    public class SelectedBook : Book{
+        public string method {get;set;} = "Create";
     }
 
 }

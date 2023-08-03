@@ -3,28 +3,34 @@
 @{
     ViewData["Title"] = "Register";
 }
-
-<form asp-action="Register"> 
-    <!-- Username input -->
-    <div class="form-outline mb-4">
-        <input type="text" asp-for="Username" id="loginUsername" class="form-control" />
-        <label class="form-label" asp-for="Username">Username</label>
-    </div>
-
-    <!-- Password input -->
-    <div class="form-outline mb-4">
-        <input type="password" asp-for="Password" id="loginPassword" class="form-control" />
-        <label class="form-label" asp-for="Password">Password</label>
-    </div>
-    <div class="help-block text-danger" asp-validation-summary="All"></div>
-    <!-- 2 column grid layout for inline styling -->
-    <div class="row mb-4">
-        <div class="col">
-            <!-- Simple link -->
-            <a href="#!">Forgot password?</a>
+<div class="container d-flex justify-content-center" >
+    <div style="width: 480px; height: 900px;">
+        <form asp-action="Register"> 
+        <!-- Username input -->
+        <div class="form-outline mb-4">
+            <label class="form-label" asp-for="Username">Username</label>
+            <input type="text" asp-for="Username" id="loginUsername" class="form-control" />
         </div>
+
+        <!-- Password input -->
+        <div class="form-outline mb-4">
+            <label class="form-label" asp-for="Password">Password</label>
+            <input type="password" asp-for="Password" id="loginPassword" class="form-control" />
+        </div>
+        <div class="help-block text-danger" asp-validation-summary="All"></div>
+        <!-- 2 column grid layout for inline styling -->
+        <div class="row mb-4">
+            <div class="col">
+                <!-- Simple link -->
+                <a href="#!">Forgot password?</a>
+            </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" value="Register" class="btn btn-primary btn-block mb-4">Register</button>
+        </form>
     </div>
 
-    <!-- Submit button -->
-    <button type="submit" value="Register" class="btn btn-primary btn-block mb-4">Register</button>
-</form>
+</div>
+
+    

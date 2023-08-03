@@ -2,23 +2,25 @@
 
 <canvas id="myChart" style="width:100%;max-width:720px;height:100%;max-height:500px"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+<script type="text/javascript">
   	const ctx = document.getElementById('myChart');
 	const data = @Json.Serialize(Model)
 	const label = []
 	const value = []
+
 	for (i of data){
-		label.push(i.name)
+		label.push(i.title)
 		value.push(i.price)
 	}
-	new Chart(ctx, {
+	console.log(label);
+	console.log(value);
+	new Chart("myChart", {
 		type: 'bar',
 		data: {
 			labels: label,
 			datasets: [{
 				label: 'Book Price',
 				data: value,
-				borderWidth: 1
 			}]
 		},
 		options: {
@@ -30,8 +32,8 @@
 		}
 	});
 </script>
-@* 
-<script type="text/javascript">
+
+@* <script type="text/javascript">
     const data = @Json.Serialize(Model)
 	const chart = []
 	for (i of data){
@@ -45,10 +47,13 @@
 	type: "bar",
 	data: {
 		labels: xValues,
-		datasets: [{
-		backgroundColor: barColors,
-		data: yValues
-		}]
+		datasets: [
+			{
+				label: 'Book Price',
+				backgroundColor: barColors,
+				data: yValues
+			}
+		]
 	}
 	});
 </script> *@
