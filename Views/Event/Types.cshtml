@@ -37,8 +37,8 @@
                 <td>
                     <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditType-" + item.Guid)" data-url="@Url.Action($"Edit","Type",item.Guid)">Edit</a>
                     @await Html.PartialAsync("Modal/_EditType", item)
-                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteType-" + item.Guid)" data-url="@Url.Action($"Delete","Type",item.Guid)">Delete</a>
-                    @await Html.PartialAsync("Modal/_ConfirmDelete",item)
+                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteModal-" + item.Guid)">Delete</a>
+                    @await Html.PartialAsync("Modal/_ConfirmDelete",new mvc.Models.DTO.Modal(item.Guid, "Event", "DeleteType"))
 
                 </td>
             </tr>

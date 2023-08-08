@@ -6,8 +6,15 @@ namespace mvc.Models.Event
 {
     public class EventType
     {
+        public EventType(){
+            
+        }
+        public EventType(string id){
+            Guid = Guid.Parse(id);
+        }
         [Key]
         public Guid Guid { get; set; } = Guid.NewGuid();
+        [Required]
         public string Name { get; set; } = string.Empty;
 
         public List<Event> Events { get; set; }

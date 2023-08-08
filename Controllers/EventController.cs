@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using mvc.Models.DTO;
 
 namespace mvc.Controllers
 {
@@ -23,11 +24,13 @@ namespace mvc.Controllers
         }
         public IActionResult Index()
         {
-            List<Event> events = _db.Events.Include(x=>x.Type).ToList();
+            List<Event> events = _db.Events.Include(x=>x.Type).Include(x=> x.Schedules).ToList();
             foreach (Event e in events)
             {
                 e.setDate();
             }
+            var Types= _db.EventTypes.ToList();
+            ViewBag.Types = _db.EventTypes.ToList();
             return View(
                     new PaginateEvent
                     {
@@ -40,7 +43,6 @@ namespace mvc.Controllers
         [HttpGet]
         public IActionResult CreateType() 
         {
-            Console.WriteLine("sampai disini saja");
             return PartialView("Modal/_CreateType");
         }
         [HttpPost]
@@ -77,19 +79,26 @@ namespace mvc.Controllers
                 });
         }
         [HttpGet]
-        public IActionResult CreateEvent()
-        {
-            Console.WriteLine("this is called");
-            ViewBag.Type = _db.Events.ToList();
-            return PartialView("_PartialEvent");
-        }
+
         [HttpPost]
-        public async Task<IActionResult> CreateEvent(Event Event)
+        public async Task<IActionResult> CreateEvent(EventDto Event)
         {
-            ViewBag.Type = _db.Events.ToList();
-            _db.Events.Add(Event);
-            await _db.SaveChangesAsync();
+            if(ModelState.IsValid){
+                Event e = new Event
+                {
+                    Name = Event.Name,
+                    Description = Event.Description,
+                    Type = new EventType(Event.Type)
+                };
+                Console.WriteLine(Event.Name, Event.Description, Event.Type);
+                _db.Events.Add(e);
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            Console.WriteLine("Failed Creating Event");
+            ViewData.Add("","Invalid Model");
             return RedirectToAction("Index");
+            
         }
         [HttpGet]
         public IActionResult EditEvent()
@@ -135,6 +144,29 @@ namespace mvc.Controllers
                 Pagination = new Pagination(),
                 EventSchedules = _db.EventsSchedules.Where(x => x.Event.Guid == Guid.Parse(EventId)).Include(x=>x.Event).ToList()
             });
+        }
+    
+        [HttpPost]
+        public async Task<IActionResult> DeleteEvent(Guid Guid){
+            if(!_db.Events.Any(x=> x.Guid == Guid)){
+                ViewData.Add("","Item is not exists");
+                return RedirectToAction("Index");
+            }
+            Event e = _db.Events.FirstOrDefault(x=> x.Guid==Guid);
+            _db.Events.Remove(e);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public IActionResult DeleteType(Guid Guid){
+            if(!_db.Events.Any(x=> x.Guid==Guid)){
+                ViewData.Add("", "Item is not exists");
+                return RedirectToAction("Index");
+            }
+            EventType e = _db.EventTypes.FirstOrDefault(x=> x.Guid==Guid);
+            _db.EventTypes.Remove(e);
+            _db.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }

@@ -39,7 +39,7 @@ namespace mvc.Controllers
             return Ok(book);
         }
         // GET: id
-        public IActionResult Index(string search, int page = 1, int limit =5, string orderBy ="DateCreated", string desc="")
+        public IActionResult Index(string search, int page = 1, int limit =5, string orderBy ="DateCreated", string desc="desc")
         {
             string query="select * from Book where 1=1";
             if(!search.IsNullOrEmpty()){
@@ -49,7 +49,7 @@ namespace mvc.Controllers
                     query+=" or Title like "+searchStr;
                     query+=")";
             }
-            query+=" order by "+orderBy+" "+desc+"OFFSET 0 ROWS";
+            query+=" order by "+orderBy+" "+desc+" OFFSET 0 ROWS";
             Console.WriteLine(query);
             IQueryable<Book> books = _db.Book.FromSqlRaw(query);
 
