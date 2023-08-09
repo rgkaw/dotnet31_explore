@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using mvc.Data.Validator;
 
 namespace mvc.Models.Event
 {
     public class EventSchedule
     {
+
         [Key]
         public Guid Guid { get; set; } = Guid.NewGuid();
         public Event Event { get; set; }

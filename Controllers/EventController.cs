@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using mvc.Models.DTO;
+using System.ComponentModel;
 
 namespace mvc.Controllers
 {
@@ -83,12 +84,17 @@ namespace mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEvent(EventDto Event)
         {
+         
             if(ModelState.IsValid){
+                if(!_db.EventTypes.Any(x=> x.Guid.ToString()==Event.Type)){
+                    ViewData.Add("", "Invalid TypeId");
+                    return RedirectToAction("Index");
+                }
                 Event e = new Event
                 {
                     Name = Event.Name,
                     Description = Event.Description,
-                    Type = new EventType(Event.Type)
+                    Type = _db.EventTypes.FirstOrDefault(x=> x.Guid.ToString() == Event.Type)
                 };
                 Console.WriteLine(Event.Name, Event.Description, Event.Type);
                 _db.Events.Add(e);
@@ -114,16 +120,44 @@ namespace mvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreateTimeLine() 
+        public IActionResult CreateEventSchedule() 
         {
-            return View();
+            Console.WriteLine("CreateEventSchedule PartialView");
+            return PartialView("_CreateEventSchedule");
         }
         [HttpPost]
-        public async Task<IActionResult> CreateTimeLine(EventSchedule EventSchedule)
+        public async Task<IActionResult> CreateEventSchedule(EventScheduleDto EventSchedule)
         {
-            _db.EventsSchedules.Add(EventSchedule);
+            if(!ModelState.IsValid){
+                return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
+            }
+            if(EventSchedule.Start<EventSchedule.End){
+                ModelState.AddModelError("DateRangeError","Start Date Must Before End Date");
+                return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
+            }
+            Console.WriteLine("CreateEventSchedule");
+            // foreach(PropertyDescriptor descriptor in TypeDescriptor.GetProperties(EventSchedule))
+            // {
+            //     string name = descriptor.Name;
+            //     object value = descriptor.GetValue(EventSchedule);
+            //     Console.WriteLine("{0}={1}", name, value);
+            // }
+            EventSchedule es = new EventSchedule{
+                Event = _db.Events.FirstOrDefault(x=>x.Guid.ToString() == EventSchedule.EventGuid),
+                Start = EventSchedule.Start,
+                End = EventSchedule.End,
+                Description = EventSchedule.Description
+            };
+            List<EventSchedule> ScheduleList = _db.EventsSchedules.Where(x=> x.Event == es.Event).OrderByDescending(x=>x.End).ToList();
+            if(ScheduleList.Count>0){
+                if(EventSchedule.Start<ScheduleList.First().End){
+                    ModelState.AddModelError("DateRangeError","Start Date Must After Previous Schedule");
+                    return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
+                }
+            }
+            _db.EventsSchedules.Add(es);
             await _db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
 
         }
         public async Task<IActionResult> EditTimeLine(EventSchedule EventSchedule) 
@@ -167,6 +201,33 @@ namespace mvc.Controllers
             _db.EventTypes.Remove(e);
             _db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult ManageSchedule(string id){
+            Event e = _db.Events.Include(x=> x.Schedules).FirstOrDefault(x=> x.Guid.ToString() == id);
+            return View(e);
+        }
+        public JsonResult isScheduleModelValid(EventScheduleDto e){
+            if(!ModelState.IsValid){
+                Console.WriteLine("false");
+                return Json(ModelState);
+            }
+            if(e.Start<e.End){
+                ModelState.AddModelError("DateRangeError","Start Date Must Before End Date");
+                Console.WriteLine("false");
+                return Json(ModelState);
+            }
+            List<EventSchedule> ScheduleList = _db.EventsSchedules.Include(x=>x.Event).Where(x=> x.Event.Guid.ToString() == e.EventGuid).OrderByDescending(x=>x.End).ToList();
+            if(ScheduleList.Count>0){
+                if(e.Start<ScheduleList.First().End){
+                    ModelState.AddModelError("DateRangeError","Start Date Must After Previous Schedule");
+                    Console.WriteLine("false");
+                    return Json(ModelState);
+                }
+            }
+            Console.WriteLine("true");
+            return Json(true);
         }
     }
 }

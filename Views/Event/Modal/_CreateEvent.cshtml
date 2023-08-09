@@ -1,4 +1,11 @@
-﻿@model mvc.Models.DTO.EventDto
+﻿@model mvc.Models.Event.Event
+@foreach(var item in ViewBag.Types){
+    Console.WriteLine(item.Guid);
+    int ctr=0;
+}
+@{
+    List<SelectListItem> list = new SelectList(ViewBag.Types, "Guid", "Name").ToList();
+}
 <!-- Modal -->
 <div class="modal fade" id="CreateEvent" aria-labelledby="CreateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -10,6 +17,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div class=""></div>
                 <form asp-action="CreateEvent">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
@@ -19,10 +27,10 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="Type" class="col-form-label">Type</label>
-
-                        <select asp-for"Type" class="form-control">
+                        @* <select asp-items="@ViewBag.Types" class="form-select"></select> *@
+                        <select asp-for="Type" class="form-control">
                             @foreach(var item in ViewBag.Types){
-                                <option value="@item.Guid">@item.Guid</option>
+                                <option asp-for="@item.Guid.ToString()">@item.Guid</option>
                                 <a>@item.Guid</a>
                             }
                         </select>
@@ -33,7 +41,6 @@
                         <input asp-for="Description" class="form-control" />
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
-                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Create</button>
@@ -44,3 +51,52 @@
         </div>
     </div>
 </div>
+<div class="input-group date" data-provide="datepicker">
+    <input type="text" class="form-control">
+    <div class="input-group-addon">
+        <span class="glyphicon glyphicon-th"></span>
+    </div>
+</div>
+
+<script>
+    
+    $(function () {
+    
+    // Start counting from the third row
+    var counter = 0;
+    $(".datepicker").datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true,
+    });
+
+    $("#insertRow").on("click", function (event) {
+        event.preventDefault();
+
+        var newRow = $("<tr>");
+        var cols = '';
+
+        // Table columns
+        cols += '<th scrope="row">' + counter + '</th>';
+        cols += '<td><input class="datepicker" type="date" for></td>';
+        cols += '<td><input class="form-control rounded-0" type="text" name="lastname" placeholder="Last name"></td>';
+        cols += '<td><input class="form-control rounded-0" type="text" name="handle" placeholder="Handle"></td>';
+        cols += '<td><button class="btn btn-danger" id ="deleteRow">delete</button</td>';
+
+        // Insert the columns inside a row
+        newRow.append(cols);
+
+        // Insert the row inside a table
+        $(".schedules").append(newRow);
+
+        // Increase counter after each row insertion
+        counter++;
+    });
+
+    // Remove row when delete btn is clicked
+    $(".schedules").on("click", "#deleteRow", function (event) {
+        $(this).closest("tr").remove();
+        counter -= 1
+    });
+});
+</script>
