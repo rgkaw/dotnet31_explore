@@ -8,7 +8,6 @@
 <h2>Event List</h2>
 <p>
     <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateEventSchedule")">New Schedule</button>
-    <a>@Model.Guid.ToString()</a>
     @await Html.PartialAsync("Modal/_CreateEventSchedule",new mvc.Models.DTO.EventScheduleDto(Model.Guid.ToString()))
 </p>
 <div class="row">
@@ -36,13 +35,18 @@
             <th>
                 @Html.DisplayNameFor(name => Model.Schedules.First().End)
             </th>
+            <th>
+                Completed
+            </th>
 
         </tr>
 
 
     </thead>
     <tbody>
-        @foreach (var item in Model.Schedules)
+        @{
+        }
+        @foreach (var item in Model.Schedules.OrderBy(x => x.End))
         {
             <tr>
                 <td>
@@ -55,12 +59,17 @@
                     @Html.DisplayFor(modelItem => item.End)
                 </td>
                 <td>
+                    <input id ="@item.Guid" class="completed" type="checkbox"  asp-for="@item.IsCompleted" style="pointer-events:none;">
+                </td>
+                <td>
+                    <a class="btn btn-primary" onclick="toggleSchedule('@item.Guid')">Toggle</a>
                     <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditEventSchedule-" + item.Guid)" data-url="@Url.Action($"Edit","Event",item.Guid)">Edit</a>
                     @await Html.PartialAsync("Modal/_EditEventSchedule", item)
-                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteEventSchedule-" + item.Guid)" data-url="@Url.Action($"Delete","Event",item.Guid)">Delete</a>
+                    <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteModal-" + item.Guid)">Delete</a>
                     @await Html.PartialAsync("Modal/_ConfirmDelete",new mvc.Models.DTO.Modal(item.Guid, "Event","DeleteEventSchedule"))
 
                 </td>
+
             </tr>
         }
     </tbody>
@@ -69,3 +78,48 @@
 
 
 
+<script>
+    function disable() {
+        var prevId = "";
+        var nextArr = true;
+        $("input:checkbox").each(function () {
+            //console.log(nextArr)
+            if (!nextArr) {
+                $(`#${this.id}`).attr("disabled", true)
+                return
+            }else{
+                $(`#${this.id}`).attr("disabled", false)
+            }
+            if (!this.checked) {
+                nextArr = false;
+            } else {
+                if (prevId != "") { $(`#${prevId}`).attr("disabled", true) }
+                nextArr = true;
+            }
+            prevId=this.id;
+        });
+    }
+    $(function (e) {
+        disable();
+    })
+    function toggleSchedule(str){
+        console.log(str);
+        $.ajax({
+            async: false,
+            url: "/Event/ToggleSchedule",
+            type: 'POST',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            data: {guid: str},
+            success: function (result) {
+                if (result==true || result==false) {
+                    $(`#${str}`).prop('prop', result).click();
+                    disable();
+                }
+            },
+            error: function (result) {
+                console.log('error');
+            }
+        });
+    }
+    @* document.getElementById('datePicker').valueAsDate = new Date(); *@
+</script>

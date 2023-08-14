@@ -30,6 +30,7 @@
                         <input asp-for="Description" class="form-control" />
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
+                    <a id="DateValidation" class="text-danger"></a>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Create</button>
@@ -40,28 +41,40 @@
         </div>
     </div>
 </div>
-<script>
+<script type="text/javascript">
     $(function() {
-    $('form').submit( function() {
-        //window.location.origin +
-        var target = "/Event/isScheduleModelValid"
-        var dat = $('#form').serialize();
-        alert(dat);
-        //@* return false; *@
+        var formValidation = false;
+        function setValidation(c) {
+            formValidation = c;
+            console.log('setValidation', formValidation)
+        }
+        $('form').submit( function(e) {
+            //window.location.origin +
+            var target = "/Event/isScheduleModelValid"
+            var dat = $('#form').serialize();
             $.ajax({
+                async : false,
                 url    : target,
                 type    : 'POST',
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 data    : dat,       
-                success : function( result ) {
-                            alert(JSON.stringify(result));       
+                success :  function( result ) {
+                            if(result.DateRangeError!=undefined){
+                                $('#DateValidation').text(result.DateRangeError.errors[0].errorMessage);
+                                setValidation(false);
+                            }else{
+                                $('#DateValidation').text('');
+                                setValidation(true);
+                            }
                         },
-                error   : function(result){
-                            alert(JSON.stringify(result));
+                error   :  function(result){
+                        setValidation(false);
                         } 
             });
-
-            return false;
+            if(!formValidation){
+                console.log(formValidation)
+                return false;
+            }
         });
     });
     @* document.getElementById('datePicker').valueAsDate = new Date(); *@

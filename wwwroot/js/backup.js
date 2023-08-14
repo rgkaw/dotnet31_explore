@@ -1,4 +1,4 @@
-﻿jQuery(document).ready(function ($) {
+jQuery(document).ready(function ($) {
 	var timelines = $('.cd-horizontal-timeline'),
 		eventsMinDistance = 120;
 
@@ -12,12 +12,15 @@
 			timelineComponents['eventsWrapper'] = timelineComponents['timelineWrapper'].children('.events');
 			timelineComponents['fillingLine'] = timelineComponents['eventsWrapper'].children('.filling-line');
 			timelineComponents['timelineEvents'] = timelineComponents['eventsWrapper'].find('a');
+			console.log('timelineEvents', timelineComponents['timelineEvents'])
 			timelineComponents['timelineDates'] = parseDate(timelineComponents['timelineEvents']);
+			console.log('timelineDates', timelineComponents['timelineDates']);
 			timelineComponents['eventsMinLapse'] = minLapse(timelineComponents['timelineDates']);
+			console.log('eventsMinLapse', timelineComponents['eventsMinLapse']);
 			timelineComponents['timelineNavigation'] = timeline.find('.cd-timeline-navigation');
 			timelineComponents['eventsContent'] = timeline.children('.events-content');
 
-			const totCol=timelineComponents['timelineEvents'].length;
+			const totCol = timelineComponents['timelineEvents'].length;
 			timelineComponents['eventsWrapper'].find('a.selected').addClass('selected-a');
 			timelineComponents['eventsWrapper'].find('a.selected').append('(On Progress)');
 			// console.log(x);
@@ -72,15 +75,15 @@
 			});
 		});
 	}
-//============================
+	//============================
 	function updateSlide(timelineComponents, timelineTotWidth, string) {
 		//retrieve translateX value of timelineComponents['eventsWrapper']
 		var translateValue = getTranslateValue(timelineComponents['eventsWrapper']),
 			wrapperWidth = Number(timelineComponents['timelineWrapper'].css('width').replace('px', ''));
 		//translate the timeline to the left('next')/right('prev') 
 		wrapperWidth = Number(timelineComponents['eventsWrapper'].css('width').replace('px', ''));
-		var geser=wrapperWidth - timelineTotWidth;
-		geser=geser/eventsMinDistance>1?geser:geser/2;
+		var geser = wrapperWidth - timelineTotWidth;
+		geser = geser / eventsMinDistance > 1 ? geser : geser / 2;
 		if (timelineTotWidth) {
 			(string == 'next')
 				? translateTimeline(timelineComponents, translateValue - wrapperWidth + eventsMinDistance, geser)
@@ -139,18 +142,15 @@
 	}
 
 	function setDatePosition(timelineComponents, min) {
-		
+
 
 		for (i = 0; i < timelineComponents['timelineDates'].length; i++) {
 			var distance = daydiff(timelineComponents['timelineDates'][0], timelineComponents['timelineDates'][i]),
 				distanceNorm = Math.round(distance / timelineComponents['eventsMinLapse']);
-			
+
 			var mid = 720 / timelineComponents['timelineDates'].length;
-			var lefting = timelineComponents['timelineEvents'].eq(i).hasClass('selected-a') == 'true' ? -(10000) : 0;
-			var loc = 60 + (distanceNorm * min) - lefting;
-			console.log(timelineComponents['timelineEvents'].eq(i).attr('class'));
-			console.log(i,'loc', loc, distanceNorm, min, lefting, timelineComponents['timelineEvents'].eq(i).hasClass('selected-a') == 'true');
-			timelineComponents['timelineEvents'].eq(i).css('left',loc + 'px');
+			console.log(distance, distanceNorm, mid);
+			timelineComponents['timelineEvents'].eq(i).css('left', 60 + mid + (distanceNorm * min) + 'px');
 		}
 
 
@@ -160,7 +160,6 @@
 			timeSpanNorm = timeSpan / timelineComponents['eventsMinLapse'],
 			timeSpanNorm = Math.round(timeSpanNorm) + 2,
 			totalWidth = timeSpanNorm * width;
-		console.log(timeSpan, timeSpanNorm, totalWidth);
 		timelineComponents['eventsWrapper'].css('width', totalWidth + 'px');
 		updateFilling(timelineComponents['eventsWrapper'].find('a.selected'), timelineComponents['fillingLine'], totalWidth);
 		updateTimelinePosition('next', timelineComponents['eventsWrapper'].find('a.selected'), timelineComponents);
@@ -243,7 +242,7 @@
 	}
 
 	function daydiff(first, second) {
-		return Math.round((second - first) / 345600000);
+		return Math.round((second - first) / 259200000);
 	}
 
 	function minLapse(dates) {

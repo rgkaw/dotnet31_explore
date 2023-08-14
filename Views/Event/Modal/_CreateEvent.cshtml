@@ -1,7 +1,6 @@
 ﻿@model mvc.Models.Event.Event
 @foreach(var item in ViewBag.Types){
     Console.WriteLine(item.Guid);
-    int ctr=0;
 }
 @{
     List<SelectListItem> list = new SelectList(ViewBag.Types, "Guid", "Name").ToList();
@@ -28,11 +27,11 @@
                     <div class="form-group">
                         <label asp-for="Type" class="col-form-label">Type</label>
                         @* <select asp-items="@ViewBag.Types" class="form-select"></select> *@
-                        <select asp-for="Type" class="form-control">
-                            @foreach(var item in ViewBag.Types){
-                                <option asp-for="@item.Guid.ToString()">@item.Guid</option>
+                        <select asp-for="Type" class="form-control" asp-items="list">
+                            @*@foreach(var item in ViewBag.Types){
+                                <option asp-for="Model.Type">@item.Name</option>
                                 <a>@item.Guid</a>
-                            }
+                            }*@
                         </select>
                         <span asp-validation-for="Type" class="text-danger"></span>
                     </div>
@@ -51,13 +50,6 @@
         </div>
     </div>
 </div>
-<div class="input-group date" data-provide="datepicker">
-    <input type="text" class="form-control">
-    <div class="input-group-addon">
-        <span class="glyphicon glyphicon-th"></span>
-    </div>
-</div>
-
 <script>
     
     $(function () {

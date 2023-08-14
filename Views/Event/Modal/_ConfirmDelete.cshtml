@@ -11,7 +11,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="@Model.ActionUrl" method="post">
+                <a>@Url.Action(Model.Action, Model.Controller)</a>
+                <form action="@Url.Action(Model.Action, Model.Controller)" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
                         <input type="hidden" asp-for="Guid" />

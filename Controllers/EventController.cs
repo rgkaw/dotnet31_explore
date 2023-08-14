@@ -84,10 +84,16 @@ namespace mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateEvent(EventDto Event)
         {
-         
-            if(ModelState.IsValid){
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(Event))
+            {
+                string name = descriptor.Name;
+                object value = descriptor.GetValue(Event);
+                Console.WriteLine("{0}={1}", name, value);
+            }
+            if (ModelState.IsValid){
                 if(!_db.EventTypes.Any(x=> x.Guid.ToString()==Event.Type)){
                     ViewData.Add("", "Invalid TypeId");
+                    Console.WriteLine("1");
                     return RedirectToAction("Index");
                 }
                 Event e = new Event
@@ -131,11 +137,7 @@ namespace mvc.Controllers
             if(!ModelState.IsValid){
                 return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
             }
-            if(EventSchedule.Start<EventSchedule.End){
-                ModelState.AddModelError("DateRangeError","Start Date Must Before End Date");
-                return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
-            }
-            Console.WriteLine("CreateEventSchedule");
+            Console.WriteLine("CreateEventSchedule1");
             // foreach(PropertyDescriptor descriptor in TypeDescriptor.GetProperties(EventSchedule))
             // {
             //     string name = descriptor.Name;
@@ -148,15 +150,10 @@ namespace mvc.Controllers
                 End = EventSchedule.End,
                 Description = EventSchedule.Description
             };
-            List<EventSchedule> ScheduleList = _db.EventsSchedules.Where(x=> x.Event == es.Event).OrderByDescending(x=>x.End).ToList();
-            if(ScheduleList.Count>0){
-                if(EventSchedule.Start<ScheduleList.First().End){
-                    ModelState.AddModelError("DateRangeError","Start Date Must After Previous Schedule");
-                    return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
-                }
-            }
+            Console.WriteLine("CreateEventSchedule2");
             _db.EventsSchedules.Add(es);
             await _db.SaveChangesAsync();
+            Console.WriteLine("CreateEventSchedule3");
             return RedirectToAction("ManageSchedule", new {id=EventSchedule.EventGuid});
 
         }
@@ -186,14 +183,19 @@ namespace mvc.Controllers
                 ViewData.Add("","Item is not exists");
                 return RedirectToAction("Index");
             }
-            Event e = _db.Events.FirstOrDefault(x=> x.Guid==Guid);
+            Event e = _db.Events.Include(x=> x.Schedules).FirstOrDefault(x=> x.Guid==Guid);
+
+            foreach (EventSchedule i in e.Schedules) 
+            {
+                _db.EventsSchedules.Remove(i);
+            }
             _db.Events.Remove(e);
             await _db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
         [HttpPost]
         public IActionResult DeleteType(Guid Guid){
-            if(!_db.Events.Any(x=> x.Guid==Guid)){
+            if(!_db.EventTypes.Any(x=> x.Guid==Guid)){
                 ViewData.Add("", "Item is not exists");
                 return RedirectToAction("Index");
             }
@@ -202,6 +204,19 @@ namespace mvc.Controllers
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
+        [HttpPost]
+        public IActionResult DeleteEventSchedule(Guid Guid)
+        {
+            if (!_db.EventsSchedules.Any(x => x.Guid == Guid))
+            {
+                ViewData.Add("", "Item is not exists");
+                return RedirectToAction("Index");
+            }
+            EventSchedule e = _db.EventsSchedules.Include(x=> x.Event).FirstOrDefault(x => x.Guid == Guid);
+            _db.EventsSchedules.Remove(e);
+            _db.SaveChanges();
+            return RedirectToAction("ManageSchedule", new { id = e.Event.Guid.ToString()});
+        }
 
         [HttpGet]
         public IActionResult ManageSchedule(string id){
@@ -209,11 +224,17 @@ namespace mvc.Controllers
             return View(e);
         }
         public JsonResult isScheduleModelValid(EventScheduleDto e){
-            if(!ModelState.IsValid){
+            //foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(e))
+            //{
+            //    string name = descriptor.Name;
+            //    object value = descriptor.GetValue(e);
+            //    Console.WriteLine("{0}={1}", name, value);
+            //}
+            if (!ModelState.IsValid){
                 Console.WriteLine("false");
                 return Json(ModelState);
             }
-            if(e.Start<e.End){
+            if(e.Start>e.End){
                 ModelState.AddModelError("DateRangeError","Start Date Must Before End Date");
                 Console.WriteLine("false");
                 return Json(ModelState);
@@ -226,8 +247,52 @@ namespace mvc.Controllers
                     return Json(ModelState);
                 }
             }
-            Console.WriteLine("true");
             return Json(true);
         }
+        [HttpPost]
+        public JsonResult ToggleSchedule(string guid) {
+            
+            if (!_db.EventsSchedules.Any(x => x.Guid.ToString() == guid)) {
+                return Json("error");
+            }
+            EventSchedule e = _db.EventsSchedules.Include(x=>x.Event).FirstOrDefault(x=>x.Guid.ToString()==guid);
+            List < EventSchedule > list = _db.EventsSchedules.Where(x=> x.Event==e.Event).OrderBy(x=>x.End).ToList();
+            int nextIdx = list.IndexOf(e)+1;
+            EventSchedule next;
+            if (nextIdx > 0)
+            {
+                next = list[nextIdx];
+            }
+            else 
+            {
+                next = null;
+            }
+            if (e.IsCompleted)
+            {
+                e.IsDoing = true;
+                e.IsCompleted = false;
+                if (next != null) 
+                {
+                    Console.WriteLine(next.End.ToString());
+                    next.IsDoing = false; 
+                }
+            }
+            else
+            {
+                e.IsDoing = false;
+                e.IsCompleted = true;
+                if (next != null)
+                {
+                    next.IsDoing = true;
+                }
+            }
+            Console.WriteLine(e.IsCompleted);
+            _db.EventsSchedules.Update(e);
+            if (next != null) {_db.EventsSchedules.Update(next); }
+            
+            _db.SaveChanges(); 
+            return Json(e.IsCompleted);
+        }
+
     }
 }

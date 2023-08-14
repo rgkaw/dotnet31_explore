@@ -2,35 +2,17 @@
 
 @{
     ViewData["Title"] = "Event";
-    bool first=true;
 }
 
 <h2>Event List</h2>
 <p>
+
     <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateEvent")" data-url="@Url.Action($"CreateEvent","Event")">Create</button>
+    <a class="btn btn-outline-dark" asp-action="Types">Create Types</a>
     @await Html.PartialAsync("Modal/_CreateEvent",new mvc.Models.Event.Event())
+    
 </p>
-<div class="row">
-    <div class="col">
-        <form asp-controller="Book" asp-action="Index">
-            <div class="input-group col">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">keyword</span>
-                </div>
 
-                <input type="text" class="form-control" placeholder="search by author or book title" aria-describedby="basic-addon2" name="search" asp-for="@Model.Pagination.Search">
-
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="submit">search</button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <div class="col-sm-2">
-        <a asp-action="Download" class="btn btn-primary">Download</a>
-    </div>
-</div>
  
 <table class="table">
     <thead>
@@ -69,17 +51,9 @@
                     @Html.DisplayFor(modelItem => item.EndDate)
                 </td>
                 <td>
-                    @* <a>
-                        <form class="d-inline" id="form1" method="post" asp-action="Timeline"> 
-                            <input type="hidden" name="EventId"asp-for="@item.Guid">
-                            <button class="btn btn-primary" type="submit">Open</button>
-                        </form>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="@("#EditEvent-" + item.Guid)">Edit</button>
-                        
-                    </a> *@
                     <button class="btn btn-primary" onclick="showTimeline('@item.Guid')">Show</button>
                     @{string x= Url.Action("ManageSchedule","Event")+"/"+item.Guid.ToString();}
-                    <a class="btn btn-primary" href=@x>Create Schedule</a>
+                    <a class="btn btn-primary" href=@x>Manage</a>
                     <button class="btn btn-primary" data-toggle="modal" data-target="@("#EditEvent-" + item.Guid)">Edit</button>
                     @await Html.PartialAsync("Modal/_EditEvent", item)
                     <button class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteModal-" +item.Guid)">Delete</button>
