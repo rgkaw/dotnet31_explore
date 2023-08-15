@@ -12,6 +12,7 @@ using System.Text;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace mvc
 {
@@ -27,7 +28,7 @@ namespace mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString("DockerConnection")));
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSwaggerGen(c =>
             {
@@ -47,7 +48,18 @@ namespace mvc
                 {
                     opt.LoginPath = "/Auth/Login";
                     opt.ExpireTimeSpan = TimeSpan.FromDays(1);
+                    opt.LogoutPath = "/Auth/Login";
+                    opt.AccessDeniedPath = "/Auth/Denied";
                 });
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("Admin", policy=>
+                    policy.RequireClaim(ClaimTypes.Role, "admin")
+                );
+                opt.AddPolicy("User", policy=>
+                    policy.RequireClaim(ClaimTypes.Role, "user")
+                );
+            });
             services.AddSession(opt =>
             {
                 opt.IdleTimeout = TimeSpan.FromSeconds(20);
@@ -56,6 +68,7 @@ namespace mvc
                 opt.Cookie.IsEssential = true;
                 opt.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Unspecified;
             });
+            
             
         }
 
@@ -69,7 +82,7 @@ namespace mvc
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Auth/Login");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -87,7 +100,7 @@ namespace mvc
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Book}/{action=Index}/{id?}");
             });
             app.UseStaticFiles();
         }

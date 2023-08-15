@@ -1,0 +1,80 @@
+@model PaginateBook
+@{
+    ViewData["Title"] = "Book Store";
+}
+<h2>BookList</h2>
+<div class="row">
+    <div class="col">
+        <form asp-controller="Book" asp-action="Index">
+            <div class="input-group col">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">keyword</span>
+                </div>
+                <input type="text" class="form-control" asp-for="Pagination.Search" placeholder="search by author or book title" aria-describedby="basic-addon2" name="search" asp-for="@Model.Pagination.Search">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-2">
+        <form asp-action="Download" method="get">
+            <input type="hidden" name="limit"value=@Model.Pagination.Limit />
+            <input type="hidden" name="page"value=@Model.Pagination.Page />
+            <input type="hidden" name="search" value=@Model.Pagination.Search />
+            <input type="submit" value="Download This Page" class="btn btn-primary" />
+        </form>
+    </div>
+    <div class="col-sm-2">
+        <form asp-action="Download" method="get">
+            <input type="submit" value="Download All" class="btn btn-primary" />
+        </form>
+    </div>
+</div>
+
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+@{string[] shownAttr={"Title", "Author", "Price", "Stock"};}
+
+<div class="row row-cols-1 row-cols-md-4">
+    @{int ctr=0;int colSize=3;}
+    @foreach (var item in Model.Book)
+    {
+    <div class="col">
+        <div class="card border-success mb-3" style="width: 21rem; height: 20rem;">
+            <h5 class="card-header">@item.Title</h5>
+            <div class="card-body">
+                @foreach (System.ComponentModel.PropertyDescriptor desc in System.ComponentModel.TypeDescriptor.GetProperties(item))
+                {
+                    string name=desc.Name;
+                    var val = desc.GetValue(item);
+                    if(shownAttr.Contains(name)){
+                        <div class="row border-top border-bottom border-black">
+                            <div class="col-sm-3">@name</div>
+                            <div class="col-sm-1">:</div>
+                            <div class="col-sm-7">@val</div>
+                        </div>
+                    }
+                    ctr++;
+                }
+            </div>
+            <div class="col">
+                <a class="btn btn-danger" data-toggle="modal" data-target="@("#Confirm-" + item.Id)">Delete</a>
+                @await Html.PartialAsync("_Confirm",item)
+                
+            </div>
+            <br>
+            <div class="card-footer">
+            <small class="text-muted">Last Update: @item.DateModified.ToString("dd MMM yyyy")</small>
+            </div>
+        </div>
+    </div>
+
+    }
+    @for(int i = 0;i<colSize-ctr%colSize; i++){
+        <div class="col"></div>
+    }
+</div>
+@await Html.PartialAsync("_pagination",Model.Pagination)
+

@@ -13,19 +13,33 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1 justify-content-end">
                         <li class="nav-item">
-                            @{string authAction = this.User.Identity.IsAuthenticated ? "Logout":"Login";}
-                            <a class="nav-link text-dark text-right" asp-area="" asp-controller="Auth" asp-action="@authAction">@authAction</a>   
+                            <a class="nav-link text-dark text-right" asp-area="" asp-controller="Store" asp-action="Topup">Top Up</a>
                         </li>
-                        @if(authAction=="Login"){
-                            <li>
-                                <a class="nav-link text-dark text-right" asp-area="" asp-controller="Auth" asp-action="Register">Register</a>
-                            </li>
-                        }
-                        
+                        <li class="nav-item">
+                            @{string authAction = this.User.Identity.IsAuthenticated ? "Logout":"Login";}
+                            <a class="nav-link text-dark text-right" asp-area="" asp-controller="Auth" asp-action="@authAction">@authAction</a>
+                        </li>
                     </ul>
+
+                    <ul class="navbar-nav flex-grow-1">
+                        <li>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Index">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Price">Price Rank</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="BestSeller">Price Rank</a>
+                        </li>
+                    </ul>
+
                 </div>
             </div>
         </nav>

@@ -10,12 +10,7 @@
     <button class="btn btn-outline-dark" data-toggle="modal" data-target="@("#CreateEventSchedule")">New Schedule</button>
     @await Html.PartialAsync("Modal/_CreateEventSchedule",new mvc.Models.DTO.EventScheduleDto(Model.Guid.ToString()))
 </p>
-<div class="row">
-    <div class="col"></div>
-    <div class="col-sm-2">
-        <a asp-action="Download" class="btn btn-primary">Download</a>
-    </div>
-</div>
+
 
 
 

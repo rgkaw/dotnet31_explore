@@ -1,5 +1,6 @@
 @model mvc.Models.DTO.EventScheduleDto
 <!-- Modal -->
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
 <div class="modal fade" id="CreateEventSchedule" aria-labelledby="CreateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -41,7 +42,15 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
+    $(document).ready(function(){      //Add this line (and it's closing line)
+        $("input[type=date]")
+        .datepicker({ format: 'dd-mm-yyyy', changeYear: true, yearRange: "-10:+10" })
+        .attr("type", "text");
+    });
     $(function() {
         var formValidation = false;
         function setValidation(c) {

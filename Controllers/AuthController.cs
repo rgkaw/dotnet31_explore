@@ -12,6 +12,7 @@ using mvc.Models;
 using mvc.Models.DTO;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
@@ -25,9 +26,7 @@ namespace mvc.Controllers
     public class AuthController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly IConfiguration _config;
-        public AuthController(ApplicationDbContext db, IConfiguration config) {
-            _config = config;
+        public AuthController(ApplicationDbContext db) {
             _db = db;
         }
         public IActionResult Index() {
@@ -59,6 +58,7 @@ namespace mvc.Controllers
         [HttpGet]
         public ActionResult Login() {
             ClaimsPrincipal claimUser = HttpContext.User;
+            
             if (claimUser.Identity.IsAuthenticated) 
             {
                 return RedirectToAction("Index", "Book");
@@ -84,8 +84,8 @@ namespace mvc.Controllers
 
             List<Claim> claims = new List<Claim>
             {
-                new Claim("username", User.Username)
-
+                new Claim(ClaimTypes.Name, User.Username),
+                new Claim(ClaimTypes.Role, User.Role)
             };
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             AuthenticationProperties properties = new AuthenticationProperties()
@@ -94,59 +94,35 @@ namespace mvc.Controllers
                 IsPersistent = true
             };
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
-            return RedirectToAction("Index", "Book");
+            if(User.Role=="admin"){
+                return RedirectToAction("Index", "Book");
+            }
+            return RedirectToAction("Index", "Store");
 
         }
 
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Auth");
+        }
+
+        public IActionResult Denied(){
+            return View();
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-
-            }
+            using var hmac = new HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            using (var hmac = new HMACSHA512(passwordSalt)) {
-                var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computeHash.SequenceEqual(passwordHash);
-            }
+            using var hmac = new HMACSHA512(passwordSalt);
+            var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            return computeHash.SequenceEqual(passwordHash);
         }
-        private string CreateToken(User user) {
-            List<Claim> claims = new List<Claim> 
-            {
-                new Claim("username", user.Username)
-
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _config.GetSection("AppSettings:TokenSecret").Value));
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials:cred
-                );
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            return jwt;
-        }
-        private static string ByteArrayToString(byte[] ba)
-        {
-            StringBuilder hex = new StringBuilder(ba.Length * 2);
-            foreach (byte b in ba)
-                hex.AppendFormat("{0:x2}", b);
-            return hex.ToString();
-        }
-
     }
     
 }

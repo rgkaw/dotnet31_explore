@@ -10,18 +10,17 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using mvc.Models.DTO;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace mvc.Controllers
 {
+    [Authorize(Policy = "Admin")]
     public class EventController : Controller
     {
         private readonly ApplicationDbContext _db;
         public EventController(ApplicationDbContext db) 
         {
             _db = db;
-        }
-        public IActionResult text() {
-            return View();
         }
         public IActionResult Index()
         {
@@ -79,7 +78,6 @@ namespace mvc.Controllers
                     EventType = _db.EventTypes.ToList()
                 });
         }
-        [HttpGet]
 
         [HttpPost]
         public async Task<IActionResult> CreateEvent(EventDto Event)
@@ -110,7 +108,7 @@ namespace mvc.Controllers
             Console.WriteLine("Failed Creating Event");
             ViewData.Add("","Invalid Model");
             return RedirectToAction("Index");
-            
+
         }
         [HttpGet]
         public IActionResult EditEvent()

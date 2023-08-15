@@ -13,7 +13,7 @@ using mvc.Models.DTO;
 
 namespace mvc.Controllers
 {
-    [Authorize]
+    [Authorize(Policy="Admin")]
     public class AttachmentController : Controller
     {
         private readonly ApplicationDbContext _db;

@@ -135,32 +135,35 @@
 			eventWidth = eventStyle.getPropertyValue("width");
 		eventLeft = Number(eventLeft.replace('px', '')) + Number(eventWidth.replace('px', '')) / 2;
 		var scaleValue = eventLeft / totWidth;
+		console.log(scaleValue);
 		setTransformValue(filling.get(0), 'scaleX', scaleValue);
 	}
 
 	function setDatePosition(timelineComponents, min) {
-		
-
+		var nextOffset=0;
 		for (i = 0; i < timelineComponents['timelineDates'].length; i++) {
 			var distance = daydiff(timelineComponents['timelineDates'][0], timelineComponents['timelineDates'][i]),
-				distanceNorm = Math.round(distance / timelineComponents['eventsMinLapse']);
-			
-			var mid = 720 / timelineComponents['timelineDates'].length;
-			var lefting = timelineComponents['timelineEvents'].eq(i).hasClass('selected-a') == 'true' ? -(10000) : 0;
-			var loc = 60 + (distanceNorm * min) - lefting;
-			console.log(timelineComponents['timelineEvents'].eq(i).attr('class'));
-			console.log(i,'loc', loc, distanceNorm, min, lefting, timelineComponents['timelineEvents'].eq(i).hasClass('selected-a') == 'true');
+				distanceNorm = Math.round(i);
+			console.log('distance', distance,'eventsMinLapse',timelineComponents['eventsMinLapse'])
+			var lefting=0;
+			var x = timelineComponents['timelineEvents'].eq(i);
+			if(typeof x.attr('class')=='string'){
+				if(x.attr('class').split(' ').includes('selected-a')){
+					lefting += x.width()/4;
+				}
+			}
+			var loc = (60+(i) * min) - lefting;
 			timelineComponents['timelineEvents'].eq(i).css('left',loc + 'px');
+			nextOffset=lefting/2;
 		}
 
 
 	}
 	function setTimelineWidth(timelineComponents, width) {
 		var timeSpan = daydiff(timelineComponents['timelineDates'][0], timelineComponents['timelineDates'][timelineComponents['timelineDates'].length - 1]),
-			timeSpanNorm = timeSpan / timelineComponents['eventsMinLapse'],
+			timeSpanNorm = timelineComponents['eventsMinLapse']==0? 1: timeSpan / timelineComponents['eventsMinLapse'],
 			timeSpanNorm = Math.round(timeSpanNorm) + 2,
-			totalWidth = timeSpanNorm * width;
-		console.log(timeSpan, timeSpanNorm, totalWidth);
+			totalWidth = 720*(Math.ceil(timeSpanNorm * width/720));
 		timelineComponents['eventsWrapper'].css('width', totalWidth + 'px');
 		updateFilling(timelineComponents['eventsWrapper'].find('a.selected'), timelineComponents['fillingLine'], totalWidth);
 		updateTimelinePosition('next', timelineComponents['eventsWrapper'].find('a.selected'), timelineComponents);

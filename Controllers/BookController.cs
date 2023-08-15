@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using static System.Reflection.Metadata.BlobBuilder;
 namespace mvc.Controllers
 {
-    [Authorize]
+    [Authorize(Policy="Admin")]
     public class BookController : Controller
     {
 
@@ -25,20 +25,6 @@ namespace mvc.Controllers
         {
             _db = db;
         }
-        [HttpGet("api/v1/getbook")]
-        public IActionResult getId(int id) {
-            if (!_db.Book.Any(x => x.Id == id))
-            {
-                return NotFound("Not Found");
-            }
-            List<Book> book = new List<Book>
-                {
-                    _db.Book.FirstOrDefault(x => x.Id == id)
-
-                };
-            return Ok(book);
-        }
-        // GET: id
         public IActionResult Index(string search, int page = 1, int limit =5, string orderBy ="DateCreated", string desc="desc")
         {
             string query="select * from Book where 1=1";
@@ -187,37 +173,37 @@ namespace mvc.Controllers
             var totalItem = ibooks.Count();
             var totalPages = (int)Math.Ceiling((double)totalItem / (double)limit);
             List < Book > books = ibooks.ToList();
-            using (ExcelPackage excelPackage = new ExcelPackage())
+            using ExcelPackage excelPackage = new ExcelPackage();
+            Console.WriteLine(books.Count());
+            string filename = "Table_List";
+            ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(filename);
+            if (!books.Any())
             {
-                Console.WriteLine(books.Count());
-                string filename= "Table_List";
-                ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(filename);
-                if(!books.Any()){
-                    ViewData.Add("ErrorDownload","Table is Empty! nothing to download");
-                    RedirectToAction("Index");
-                }
-                int i=1;
-                foreach(var prop in books.First().GetType().GetProperties()){
-                    worksheet.Cells[1,i].Value=prop.Name;
-                    i++;
-                    Console.WriteLine(i);
-                }
-                for(i = 0; i<books.Count;i++)
-                {
-                    PropertyInfo[] prop = books[i].GetType().GetProperties();
-                    int j=1;
-                    foreach(var val in prop){
-                        worksheet.Cells[i+2,j].Value=val.GetValue(books[i],null).ToString();
-                        j++;
-                        Console.WriteLine(i.ToString()+j.ToString());
-                    }
-                }
-                MemoryStream stream = new MemoryStream();
-                excelPackage.SaveAs(stream);
-                stream.Position=0;
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",filename+".xlsx");
-
+                ViewData.Add("ErrorDownload", "Table is Empty! nothing to download");
+                RedirectToAction("Index");
             }
+            int i = 1;
+            foreach (var prop in books.First().GetType().GetProperties())
+            {
+                worksheet.Cells[1, i].Value = prop.Name;
+                i++;
+                Console.WriteLine(i);
+            }
+            for (i = 0; i < books.Count; i++)
+            {
+                PropertyInfo[] prop = books[i].GetType().GetProperties();
+                int j = 1;
+                foreach (var val in prop)
+                {
+                    worksheet.Cells[i + 2, j].Value = val.GetValue(books[i], null).ToString();
+                    j++;
+                    Console.WriteLine(i.ToString() + j.ToString());
+                }
+            }
+            MemoryStream stream = new MemoryStream();
+            excelPackage.SaveAs(stream);
+            stream.Position = 0;
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename + ".xlsx");
         }
 
         public IActionResult Price(){

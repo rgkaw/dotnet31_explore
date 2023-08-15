@@ -21,6 +21,8 @@ namespace mvc.Models
         public long Price {get;set;}=0;
 
         public int Stock {get;set;}=0;
+        
+        public int Sold {get;set;}=0;
 
     }
     public class PaginateBook : IPagination
@@ -28,10 +30,6 @@ namespace mvc.Models
         public Pagination Pagination { get; set; }
         public List<Book> Book { get; set; }
         public Book Selected {get;set;}
-    }
-
-    public class SelectedBook : Book{
-        public string method {get;set;} = "Create";
     }
 
 }

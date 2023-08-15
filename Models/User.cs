@@ -18,6 +18,9 @@ namespace mvc.Models
         public byte[] PasswordSalt { get; set; }
         [Required]
         public virtual DateTime CreationDate { get; } = DateTime.Now;
+        public string Role {get;set;} = "user";
+
+        public double balance = 1000;
 
     }
 
@@ -26,4 +29,10 @@ namespace mvc.Models
         public Pagination Pagination { get; set; }
         public List<User> User { get; set; }
     }
+
+    public enum ROLE
+    {
+
+    }
+
 }

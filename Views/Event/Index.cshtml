@@ -70,100 +70,16 @@
     @foreach (var item in Model.Event)
     {
         if(item.Schedules.Count!=0){
-            <div id="@item.Guid">
+            <div id="@item.Guid" style="display:none;">
                 @Html.Partial("Modal/_Timeline", item.Schedules)
             </div>
         }
-        
-        @* <li @(item.IsDoing ? "class=selected" : "") data-date="@item.Start.ToString("dd/MM/yyyy")">
-            <h5>@item.Start.ToString("dd MMM yyyy") - @item.End.ToString("dd MMM yyyy")</h5>
-            <hr>
-            <p>@item.Description <br /></p>
-        </li> *@
+
     }
 </div>
 @Html.Partial("_pagination",Model.Pagination)
 
 
-
-<!-- Button trigger modal -->
-<!-- Modal -->
-
-@* <div class="container text-center my-3">
-    <h2 class="font-weight-light">Bootstrap 4 - Multi Item Carousel</h2>
-    <div class="row mx-auto my-auto">
-        <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
-            <div class="carousel-inner w-100" role="listbox">
-
-                @foreach(var item in Model.Event){
-                    string[] shownAttr= {"Description","Type", "StartDate","EndDate"};
-                    if(first){
-                        <div class="carousel-item active">
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">title</div>
-                                    <div class="card-body">
-                                        @foreach (System.ComponentModel.PropertyDescriptor desc in System.ComponentModel.TypeDescriptor.GetProperties(item))
-                                        {
-                                            string name=desc.Name;
-                                            var val= new object();
-                                            if (name.Contains("Date")){
-                                                DateTime x = (DateTime) desc.GetValue(item);
-                                                val= x.ToString("dd MMM yyyy");
-                                            } else if(name=="Type"){
-                                                mvc.Models.Event.EventType e = (mvc.Models.Event.EventType) desc.GetValue(item);
-                                                val= e.Name; 
-                                            }else{
-                                                val= desc.GetValue(item);
-                                            }
-                                            if(shownAttr.Contains(name)){
-                                                <div class="row border-bottom border-black">
-                                                    <div class="col-sm-5">@name</div>
-                                                    <div class="col-sm-1">:</div>
-                                                    <div class="col-sm-5">@val</div>
-                                                </div>
-                                            }
-                                        }
-                                    </div>
-                                    <div class="card-footer">
-                                        <form id="form1" method="post" asp-action="Timeline"> 
-                                            <input type="hidden" name="EventId"asp-for="@item.Guid">
-                                            <button class="btn btn-primary" type="submit">Open</button>
-                                            <a class="btn btn-primary" data-toggle="modal" data-target="@("#EditEvent-" + item.Guid)" data-url="@Url.Action($"Edit","Event",item.Guid)">Edit</a>
-                                            @await Html.PartialAsync("Modal/_EditEvent", item)
-                                            <a class="btn btn-danger" data-toggle="modal" data-target="@("#DeleteEvent-" + item.Guid)" data-url="@Url.Action($"Delete","Event",item.Guid)">Delete</a>
-                                            @await Html.PartialAsync("Modal/_ConfirmDelete",item)
-                                        </form>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </div>
-                    }else{
-                        <div class="carousel-item active">
-                            <div class="col-md-4">
-                                <div class="card card-body">
-                                    <img class="img-fluid" src="http://placehold.it/380?text=1">
-                                </div>
-                            </div>
-                        </div>
-                    }
-
-                }
-
-            </div>
-            <a class="carousel-control-prev w-auto" href="#recipeCarousel" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon bg-dark border border-dark rounded-circle" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next w-auto" href="#recipeCarousel" role="button" data-slide="next">
-                <span class="carousel-control-next-icon bg-dark border border-dark rounded-circle" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-    </div>
-    <h5 class="mt-2">Advances one slide at a time</h5>
-</div> *@
 <script>
     function showTimeline(id){
         var x = $(`#${id}`)
