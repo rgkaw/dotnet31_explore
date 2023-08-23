@@ -17,19 +17,6 @@
             </div>
         </form>
     </div>
-    <div class="col-sm-2">
-        <form asp-action="Download" method="get">
-            <input type="hidden" name="limit"value=@Model.Pagination.Limit />
-            <input type="hidden" name="page"value=@Model.Pagination.Page />
-            <input type="hidden" name="search" value=@Model.Pagination.Search />
-            <input type="submit" value="Download This Page" class="btn btn-primary" />
-        </form>
-    </div>
-    <div class="col-sm-2">
-        <form asp-action="Download" method="get">
-            <input type="submit" value="Download All" class="btn btn-primary" />
-        </form>
-    </div>
 </div>
 
 
@@ -60,8 +47,13 @@
                 }
             </div>
             <div class="col">
-                <a class="btn btn-danger" data-toggle="modal" data-target="@("#Confirm-" + item.Id)">Delete</a>
-                @await Html.PartialAsync("_Confirm",item)
+                @if(Model.OwnedBooks.Contains(item)){
+                    <a class="btn btn-primary" disabled>Buy</a>
+                }else{
+                    <a class="btn btn-primary" data-toggle="modal" data-target="@("#ConfirmBuy-" + item.Id)">Buy</a>
+                    @await Html.PartialAsync("_ConfirmBuy",item)
+                }
+                
                 
             </div>
             <br>

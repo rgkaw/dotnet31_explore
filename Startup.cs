@@ -28,6 +28,7 @@ namespace mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(Configuration);
             services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString("DockerConnection")));
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddSwaggerGen(c =>
@@ -46,10 +47,12 @@ namespace mvc
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(opt => 
                 {
+                    opt.Cookie.Name ="Test";
                     opt.LoginPath = "/Auth/Login";
-                    opt.ExpireTimeSpan = TimeSpan.FromDays(1);
+                    opt.ExpireTimeSpan = TimeSpan.FromHours(1);
                     opt.LogoutPath = "/Auth/Login";
                     opt.AccessDeniedPath = "/Auth/Denied";
+                    opt.SlidingExpiration = true;
                 });
             services.AddAuthorization(opt =>
             {
@@ -59,14 +62,6 @@ namespace mvc
                 opt.AddPolicy("User", policy=>
                     policy.RequireClaim(ClaimTypes.Role, "user")
                 );
-            });
-            services.AddSession(opt =>
-            {
-                opt.IdleTimeout = TimeSpan.FromSeconds(20);
-                opt.Cookie.Name = "accessToken";
-                opt.Cookie.Path = "/";
-                opt.Cookie.IsEssential = true;
-                opt.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Unspecified;
             });
             
             

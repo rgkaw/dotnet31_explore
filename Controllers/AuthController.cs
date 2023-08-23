@@ -2,23 +2,14 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using mvc.Data;
 using mvc.Models;
 using mvc.Models.DTO;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace mvc.Controllers
@@ -32,7 +23,6 @@ namespace mvc.Controllers
         public IActionResult Index() {
             return RedirectToAction("Login");
         }
-        
         [HttpGet]
         public IActionResult Register() {
             return View();

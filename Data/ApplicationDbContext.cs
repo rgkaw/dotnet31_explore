@@ -19,5 +19,7 @@ namespace mvc.Data
         public DbSet<EventType> EventTypes { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventSchedule> EventsSchedules { get; set; }
+
+        public DbSet<OwnedBook> OwnedBooks {get;set;}
     }
 }

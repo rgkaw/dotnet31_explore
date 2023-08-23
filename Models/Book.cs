@@ -30,6 +30,7 @@ namespace mvc.Models
         public Pagination Pagination { get; set; }
         public List<Book> Book { get; set; }
         public Book Selected {get;set;}
+        public List<Book> OwnedBooks {get;set;}
     }
 
 }

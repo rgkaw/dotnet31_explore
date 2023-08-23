@@ -20,8 +20,18 @@ namespace mvc.Models
         public virtual DateTime CreationDate { get; } = DateTime.Now;
         public string Role {get;set;} = "user";
 
+        public List<OwnedBook> OwnedBooks {get;set;}
         public double balance = 1000;
 
+    }
+    public class OwnedBook
+    {
+        [Key]
+        public Guid Guid {get;set;} = Guid.NewGuid();
+        [Required]
+        public User User {get;set;}
+        [Required]
+        public Book Book {get;set;}
     }
 
     public class PaginateUser : IPagination 

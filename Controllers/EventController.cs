@@ -11,10 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using mvc.Models.DTO;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace mvc.Controllers
 {
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class EventController : Controller
     {
         private readonly ApplicationDbContext _db;
